@@ -32,3 +32,31 @@ Probably just
 brew install starship
 ```
 
+# nvim
+Custom nvim configuration built on NvChad starter. Install NvChad from scratch, then symlink in the custom configs from this repo.
+
+## Setup
+### 1. Install NvChad starter
+```bash
+git clone https://github.com/NvChad/starter ~/.config/nvim && nvim
+```
+Run `:MasonInstallAll` and `:Lazy sync`, then close nvim.
+
+### 2. Replace starter files with dotfiles symlinks
+NvChad's starter includes `init.lua` and `lua/plugins/init.lua`. We make minimal modifications to these files to point at our `custom/` directory, which keeps the majority of customization in one place without disrupting the starter base. Replace the starter files with symlinks to our modified versions:
+
+```bash
+rm -rf ~/.config/nvim/.git
+rm ~/.config/nvim/init.lua
+rm ~/.config/nvim/lua/plugins/init.lua
+ln -s ~/dotfiles/nvim/custom ~/.config/nvim/lua/custom
+ln -s ~/dotfiles/nvim/init.lua ~/.config/nvim/init.lua
+ln -s ~/dotfiles/nvim/plugins-init.lua ~/.config/nvim/lua/plugins/init.lua
+```
+
+### 3. Install plugins
+```bash
+nvim
+# Then run :Lazy sync and :MasonInstallAll
+```
+
