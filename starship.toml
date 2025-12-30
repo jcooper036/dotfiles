@@ -1,0 +1,35 @@
+# options at https://starship.rs/config
+format = """
+$directory\
+$git_branch\
+$git_status\
+$fill\
+$python\
+$python_version_name\
+$line_break\
+$character"""
+
+[fill]
+symbol = " "
+
+[directory]
+style = "fg:#00fff7"
+truncation_length = 5
+truncation_symbol = "…/"
+truncate_to_repo = false
+
+[git_branch]
+style = "#9854ff"
+format = "[$symbol$branch ]($style)"
+
+[git_status]
+style = "#f954ff"
+format = "([$all_status$ahead_behind]($style) )"
+ahead = '⇡${count}'
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+behind = '⇣${count}'
+
+[python]
+symbol = "  "
+style = "fg:#3bd190"
+format = "[${symbol}(${version} ) ($virtualenv) ]($style)"
