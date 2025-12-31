@@ -1,5 +1,27 @@
 local plugins = {
   {
+    "hrsh7th/nvim-cmp",
+    opts = function()
+      local cmp = require("cmp")
+
+      -- Get NvChad's default config
+      local default_opts = require("nvchad.configs.cmp")
+
+      -- Override just the mappings
+      default_opts.mapping["<Tab>"] = cmp.mapping.confirm({ select = true })
+      default_opts.mapping["<C-n>"] = cmp.mapping.select_next_item()
+      default_opts.mapping["<C-p>"] = cmp.mapping.select_prev_item()
+      default_opts.mapping["<CR>"] = cmp.mapping({
+        i = function(fallback)
+          fallback()
+        end,
+      })
+
+      return default_opts
+    end,
+  },
+
+  {
     "tpope/vim-dadbod",
     lazy = false,
   },
