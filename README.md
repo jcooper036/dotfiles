@@ -2,6 +2,23 @@
 Config files for syncing across machines
 
 # setup
+## STEP 0 - Get brew and some dependencies set up
+Install Homebrew using their directions: https://brew.sh/
+
+There are two things to install to make sure brew is up and running.  
+- `uv` is the python manager from astral (https://docs.astral.sh/uv/) and 
+- `eza` is a long term project extension of exa, which is an ls augment (https://github.com/z-shell/zsh-eza). 
+- `starship` is the terminal customization tool (replacement for powerlevel10K which is not being developed anymore). 
+- `zoxide` is a navigation tool with memory, far supperior to cd (https://github.com/ajeetdsouza/zoxide). 
+```zsh
+brew install uv
+brew install eza
+brew install starship
+brew install zoxide
+brew install nvim
+```
+
+## Bring in this repo 
 Clone this repo
 ```bash
 git clone git@github.com:jcooper036/dotfiles.git ~/dotfiles

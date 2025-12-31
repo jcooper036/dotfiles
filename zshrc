@@ -12,9 +12,6 @@ autoload -Uz compinit && compinit
 # zoxide https://github.com/ajeetdsouza/zoxide
 eval "$(zoxide init zsh)"
 
-# fuzzyfinder https://github.com/junegunn/fzf#installation
-source <(fzf --zsh)
-
 # starship https://starship.rs/guide/
 export STARSHIP_CONFIG="$HOME/dotfiles/starship.toml"
 eval "$(starship init zsh)"
@@ -23,6 +20,9 @@ eval "$(starship init zsh)"
 eval "$(uv generate-shell-completion zsh)"
 
 # aliases
+alias ls='eza --icons'
+alias ll='eza -l --icons --git'
+alias tree='eza --tree --icons'
 alias python='uv run python'
 alias vim='nvim'
 alias zrc='nvim ~/.zshrc'
