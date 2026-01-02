@@ -22,6 +22,7 @@ eval "$(uv generate-shell-completion zsh)"
 # aliases
 alias ls='eza --icons'
 alias ll='eza -l --icons --git'
+alias la='eza --icons -a'
 alias tree='eza --tree --icons'
 alias python='uv run python'
 alias vim='nvim'
@@ -38,7 +39,7 @@ function py() {
 
 # secrets
 alias secret_load='load_secrets'
-alias secret_add='vim $HOME/.secrets/misc.sh'
+alias secret_add='vim $HOME/.secrets/misc.env'
 # load secrets if the file exists
 function load_secrets() {
   if [[ -d "$HOME/.secrets" ]]; then
