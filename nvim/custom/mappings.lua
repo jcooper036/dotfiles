@@ -47,6 +47,46 @@ local C = {
 		end,
 		opts = { desc = "DAP Debug run current file" },
 	},
+	{
+		modes = { "n" },
+		lhs = "<leader>do",
+		rhs = function()
+			require("dap").step_over()
+		end,
+		opts = { desc = "DAP Step over" },
+	},
+	{
+		modes = { "n" },
+		lhs = "<leader>di",
+		rhs = function()
+			require("dap").step_into()
+		end,
+		opts = { desc = "DAP Step into" },
+	},
+	{
+		modes = { "n" },
+		lhs = "<leader>dO",
+		rhs = function()
+			require("dap").step_out()
+		end,
+		opts = { desc = "DAP Step out" },
+	},
+	{
+		modes = { "n" },
+		lhs = "<leader>dt",
+		rhs = function()
+			require("dap").terminate()
+		end,
+		opts = { desc = "DAP Terminate" },
+	},
+	{
+		modes = { "n" },
+		lhs = "<leader>du",
+		rhs = function()
+			require("dapui").toggle()
+		end,
+		opts = { desc = "DAP Toggle UI" },
+	},
 }
 
 local map = vim.keymap.set
