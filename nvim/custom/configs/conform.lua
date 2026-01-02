@@ -10,6 +10,8 @@ local options = {
 		html = { "prettier" },
 
 		sh = { "shfmt" },
+
+		python = { "ruff_fix", "ruff_format" },
 	},
 
   -- adding same formatter for multiple filetypes can look too much work for some
