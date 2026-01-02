@@ -3,11 +3,16 @@ export PATH="/opt/homebrew/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PYTHONPATH=".:$PYTHONPATH/Users/$USER"
 
+# load compinit (must come before any plugins that use compdef)
+autoload -Uz compinit && compinit
+
+# zsh-autosuggestions: https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md#homebrew
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# Use Tab to accept suggestions
+bindkey '^I' autosuggest-accept
+
 # logging config
 export LOG_LEVEL='INFO'
-
-# load compinit
-autoload -Uz compinit && compinit
 
 # zoxide https://github.com/ajeetdsouza/zoxide
 eval "$(zoxide init zsh)"
