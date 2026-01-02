@@ -1,6 +1,48 @@
 # dotfiles
 Config files for syncing across machines
 
+## Configuration Flow Diagram
+
+```mermaid
+graph LR
+    REPO["~/dotfiles/"] --> ZSHRC["zshrc"]
+    REPO --> STARSHIP["starship.toml"]
+    REPO --> NVIM["nvim/custom/"]
+
+    ZSHRC -->|symlink| SYS_ZSH["~/.zshrc"]
+    NVIM -->|symlink| SYS_NVIM["~/.config/nvim/lua/custom/"]
+
+    SYS_ZSH --> SHELL["Shell loads:<br/>PATH, tools, aliases"]
+    SHELL --> SECRETS["~/.secrets/*.env<br/>(auto-loaded)"]
+    SHELL --> LOCAL["~/.zshrc.local<br/>(machine-specific)"]
+    STARSHIP -.->|referenced by| SHELL
+
+    SYS_NVIM --> NVIM_LOAD["Nvim loads custom:<br/>plugins, configs, mappings"]
+
+    classDef repo fill:#474747,stroke:#01579b,stroke-width:2px
+    classDef sys fill:#474747,stroke:#4a148c,stroke-width:2px
+    classDef secret fill:#474747,stroke:#b71c1c,stroke-dasharray:5 5
+
+    class REPO repo
+    class ZSHRC,STARSHIP,NVIM,SYS_ZSH,SYS_NVIM sys
+    class SECRETS,LOCAL secret
+```
+
+### Key Concepts
+
+**Symlinks:** `~/dotfiles/*` → system locations (`~/.zshrc`, `~/.config/nvim/lua/custom/`)
+
+**ZSH layers:**
+1. `~/dotfiles/zshrc` - shared config (version controlled)
+2. `~/.zshrc.local` - machine-specific overrides or inclusions (NOT in git, loaded last)
+
+**Secrets:** `~/.secrets/*.env` files auto-sourced by zshrc (`secret_add` to edit)
+
+**Nvim:** ALL customizations go in `~/dotfiles/nvim/custom/` (plugins, configs, mappings). Base NvChad files stay clean.
+
+**Making changes:**
+- ✅ Edit `~/dotfiles/zshrc` or `~/dotfiles/nvim/custom/*`
+- ❌ Don't modify base NvChad files outside `custom/`
 # setup
 ## STEP 0 - Get brew and some dependencies set up
 Install Homebrew using their directions: https://brew.sh/
