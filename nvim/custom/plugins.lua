@@ -67,7 +67,24 @@ local plugins = {
 	-- Core Dap
 	{
 		"mfussenegger/nvim-dap",
-		-- TODO lazy load via keys or commands
+		dependencies = {
+			"rcarriga/nvim-dap-ui",
+			"nvim-neotest/nvim-nio",
+		},
+		config = function()
+			local dap, dapui = require("dap"), require("dapui")
+			dapui.setup()
+			-- Auto open/close UI
+			dap.listeners.after.event_initialized["dapui_config"] = function()
+				dapui.open()
+			end
+			dap.listeners.after.event_terminated["dapui_config"] = function()
+				dapui.close()
+			end
+			dap.listeners.before.event_exited["dapui_config"] = function()
+				dapui.close()
+			end
+		end,
 	},
 	-- Python adaptor
 	{
@@ -78,26 +95,13 @@ local plugins = {
 			require("dap-python").setup("python") -- uses project's venv
 		end,
 	},
-	-- debugger UI
-	{
-		"rcarriga/nvim-dap-ui",
-		dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
-		config = function()
-			local dap, dapui = require("dap"), require("dapui")
-			dapui.setup()
-			-- Auto-open UI when debugging starts
-			dap.listeners.after.event_initialized["dapui_config"] = function()
-				dapui.open()
-			end
-		end,
-	},
 	-- Inline variable values with debugger
 	{
 		"theHamsta/nvim-dap-virtual-text",
 		dependencies = { "mfussenegger/nvim-dap" },
-    config = function()
-      require("nvim-dap-virtual-text").setup()
-    end,
+		config = function()
+			require("nvim-dap-virtual-text").setup()
+		end,
 	},
 }
 

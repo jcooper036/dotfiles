@@ -5,7 +5,7 @@ local C = {
 		rhs = "<cmd> Telescope keymaps <CR>",
 		-- this is telling it to go in the Telescope category under Keymaps
 		opts = { desc = "Telescope keymaps" },
-	},
+  },
 	{
 		modes = { "n" },
 		lhs = ";",
@@ -20,11 +20,11 @@ local C = {
 	},
 	{
 		modes = { "n" },
-		lhs = "<lseader>db",
+		lhs = "<leader>db",
 		rhs = function()
 			require("dap").toggle_breakpoint()
 		end,
-		opts = { desc = "Toggle breakpoint" },
+		opts = { desc = "DAP Toggle breakpoint" },
 	},
 	{
 		modes = { "n" },
@@ -32,7 +32,20 @@ local C = {
 		rhs = function()
 			require("dap").continue()
 		end,
-		opts = { desc = "Start/contine debugging" },
+		opts = { desc = "DAP Start/contine debugging" },
+	},
+	{
+		modes = { "n" },
+		lhs = "<leader>dr",
+		rhs = function()
+			require("dap").run({
+				type = "python",
+				request = "launch",
+				name = "Launch file",
+				program = "${file}",
+			})
+		end,
+		opts = { desc = "DAP Debug run current file" },
 	},
 }
 
