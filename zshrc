@@ -8,8 +8,8 @@ autoload -Uz compinit && compinit
 
 # zsh-autosuggestions: https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md#homebrew
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-# Use Tab to accept suggestions
-bindkey '^I' autosuggest-accept
+# Use Shift-Tab to accept suggestions (Tab remains for normal completion)
+bindkey '^[[Z' autosuggest-accept
 
 # logging config
 export LOG_LEVEL='INFO'
