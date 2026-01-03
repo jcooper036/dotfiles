@@ -58,6 +58,7 @@ brew install eza
 brew install starship
 brew install zoxide
 brew install nvim
+brew install zsh-autosuggestions
 ```
 
 ## Bring in this repo 
