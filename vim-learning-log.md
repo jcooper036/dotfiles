@@ -77,6 +77,24 @@ Recording keystrokes to replay.
 - `:bd pattern*` - close buffers matching pattern
 - **Search terms:** `:help :bdelete`, `:help :buffers`
 
+### Terminal Management
+- `<leader>v` / `<leader>h` / `<leader>i` - Toggle Vertical/Horizontal/Floating terminal
+- `<C-x>` - Escape terminal mode to normal mode (NvChad default)
+- `<C-\><C-n>` - Native Neovim escape terminal mode
+- **Search terms:** `:help terminal`, `:help CTRL-\_CTRL-N`
+
+### File Management (Creation)
+- `:e filename` - Edit a new file (created on `:w`)
+- `a` (inside NvimTree) - Create new file or directory (end with `/`)
+- **Search terms:** `:help :edit`, `:help nvim-tree-mappings-default`
+
+### Ranges and Whole File Operations
+- `%` - Shortcut for "the whole file"
+- `:%y` - Yank entire file without moving cursor
+- `:%d` - Delete entire file
+- `ggVG` - Select whole file in visual mode (useful if you *must* see it)
+- **Search terms:** `:help :range`, `:help %`
+
 ---
 
 ## Vim Thinking Patterns
