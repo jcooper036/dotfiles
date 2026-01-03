@@ -1,5 +1,10 @@
 local plugins = {
 	{
+		"williamboman/mason.nvim",
+		opts = require("custom.configs.overrides").mason,
+	},
+
+	{
 		"hrsh7th/nvim-cmp",
 		opts = function()
 			local cmp = require("cmp")
