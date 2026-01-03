@@ -40,6 +40,9 @@ M.mason = {
 
     -- shell stuff
     "shfmt",
+
+    -- python stuff
+    "pyright",
   },
 }
 

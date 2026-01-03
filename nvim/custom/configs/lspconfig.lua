@@ -1,3 +1,7 @@
+-- WARNING: DO NOT USE `require('lspconfig')[lsp].setup`
+-- The `require('lspconfig')` "framework" is deprecated in favor of native vim.lsp.config/enable (Neovim 0.11+).
+-- See :help lspconfig-nvim-0.11
+
 local on_attach = require("nvchad.configs.lspconfig").on_attach
 local capabilities = require("nvchad.configs.lspconfig").capabilities
 
@@ -22,4 +26,3 @@ for _, lsp in ipairs(installed_servers) do
   })
   vim.lsp.enable(lsp)
 end
-
