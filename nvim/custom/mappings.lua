@@ -75,6 +75,14 @@ local C = {
 		modes = { "n" },
 		lhs = "<leader>dt",
 		rhs = function()
+			require("dap-python").test_method()
+		end,
+		opts = { desc = "DAP Debug run test method" },
+	},
+	{
+		modes = { "n" },
+		lhs = "<leader>dq",
+		rhs = function()
 			require("dap").terminate()
 		end,
 		opts = { desc = "DAP Terminate" },

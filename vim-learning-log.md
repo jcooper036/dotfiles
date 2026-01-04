@@ -95,6 +95,14 @@ Recording keystrokes to replay.
 - `ggVG` - Select whole file in visual mode (useful if you *must* see it)
 - **Search terms:** `:help :range`, `:help %`
 
+### Marks and Jumps
+- `mm` - Set mark 'm' at current cursor position
+- `'m` - Jump back to line of mark 'm'
+- `` `m `` - Jump back to exact position of mark 'm'
+- `Ctrl-o` - Jump back in jump list (previous location)
+- `Ctrl-i` - Jump forward in jump list
+- **Search terms:** `:help marks`, `:help jumplist`
+
 ---
 
 ## Vim Thinking Patterns
