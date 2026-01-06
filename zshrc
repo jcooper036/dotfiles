@@ -31,12 +31,19 @@ alias la='eza --icons -a'
 alias tree='eza --tree --icons'
 alias python='uv run python'
 alias vim='nvim'
+
+# agent related
+alias new_claude_md='cp ~/.claude/.CLAUDE_TEMPLATE.md .'
+
+# git
 alias zrc='nvim ~/.zshrc'
 alias commit='git commit'
 alias push='git push'
 alias pull='git pull'
 alias checkout='git checkout'
 alias cug="git checkout trunk;git pull"
+
+# pytest
 alias pyt='if command -v uv >/dev/null; then uv run pytest; else pytest; fi'
 function py() {
     uv run $1
