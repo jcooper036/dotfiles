@@ -103,6 +103,13 @@ Recording keystrokes to replay.
 - `Ctrl-i` - Jump forward in jump list
 - **Search terms:** `:help marks`, `:help jumplist`
 
+### Scrolling and Big Movements
+- `Ctrl-d` / `Ctrl-u` - Down/Up half a page (most common)
+- `Ctrl-f` / `Ctrl-b` - Forward/Back a full page
+- `{number}j` / `{number}k` - Move exact line count (e.g., `10j`)
+- `}` / `{` - Jump by paragraph (blank line separated)
+- **Search terms:** `:help CTRL-D`, `:help scroll-cursor`, `:help {`
+
 ---
 
 ## Vim Thinking Patterns
