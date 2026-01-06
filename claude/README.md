@@ -10,7 +10,9 @@ This should contain general practices to emulate across ALL machines and ALL pro
 
 ### CLAUDE_template.md
 This is a lightweight template based on the intent layers architecture: https://www.intent-systems.com/learn/intent-layer#turning-on-the-lights .  It follows a concept of progressive disclosure, where each part of a project has a CLAUDE.md file. 
--- WARNING -- I don't know if this behavior is specific to Claude. I know that Claude will read all CLAUDE.md files in a tree when it goes to touch a file - I don't know if other agents do that.
+
+Local user configs should be stored in `~/CLAUDE.local.md` (note that this is NOT in the `~/.claude` directory, https://code.claude.com/docs/en/settings#what-uses-scopes)
+
 
 ## Other agents
 For Gemini, it can be made to rely on CLAUDE.md files with a simple config:
@@ -22,4 +24,3 @@ For Gemini, it can be made to rely on CLAUDE.md files with a simple config:
 }
 ```
 Obviouslly this will mean that configurationsd could get messy (and some agents don't behave well given instructions that work for other agents) but its a good starting position.
-
