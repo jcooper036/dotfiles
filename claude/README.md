@@ -4,7 +4,7 @@
 ### CLAUDE_root.md
 - is meant to be symlinked to `~/CLAUDE.md`
 ```bash
-ln -s ~/dotfiles/claude/CLAUDE_root.md ~/CLAUDE.md
+ln -s ~/dotfiles/claude/CLAUDE_root.md ~/.claude/CLAUDE.md
 ```
 This should contain general practices to emulate across ALL machines and ALL projects.
 
