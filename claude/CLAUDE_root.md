@@ -9,6 +9,7 @@ The user you are interacting with is named Jacob. He is a data scientist with br
 - whever language you are in, use type hinting on inputs and outputs
 - always 0 index counters
 ## Python
+- ALWAYS follow pep8 conventions
 - ALWAYS use `uv` to manage python env and installs
     - `uv add`, `uv sync`, `uv lock`
     - assume the uv env in active, but if it isn't `source .venv/bin/activate`
@@ -24,7 +25,7 @@ The user you are interacting with is named Jacob. He is a data scientist with br
 - ALWAYS run `mypy` (exactly that command, don't add arguments). it MUST complete with no errors in less than 5 seconds
 - always prefer `structlog` over the standard library logging module. Don't use print statements for logging, ever, use structlog
 - use `tqdm` for progress bars, never custom implementations
-- imports should ALWAYS be at the top of the file, never embedded in code, and NEVER in a try: except: clause. They should always be grouped according to pep8 convention: standard library, thrid party, recurion internal packages, then project specific imports . Arrange alphabetically in each section
+- imports should ALWAYS be at the top of the file, never embedded in code, and NEVER in a try: except: clause. They should always be grouped according to pep8 convention: standard library, thrid party, then project specific imports . Arrange alphabetically in each section
 - imports should always be absolute, never relative. using relative imports creates problems when moving code around
 - Use try - except as sparingly as possible. You should only ever use it when interfacting with external services, and that service should be wrapped in a contained interface. Most logic functions should never have a try except, only specifically service interface functions
 
