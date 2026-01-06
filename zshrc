@@ -33,7 +33,8 @@ alias python='uv run python'
 alias vim='nvim'
 
 # agent related
-alias new_claude_md='cp ~/.claude/.CLAUDE_TEMPLATE.md .'
+# copies a template CLAUDE.md to the current project
+alias new_claude_md='cp ~/dotfiles/claude/CLAUDE_TEMPLATE.md ./CLAUDE.md'
 
 # git
 alias zrc='nvim ~/.zshrc'
