@@ -95,6 +95,14 @@ local C = {
 		end,
 		opts = { desc = "DAP Toggle UI" },
 	},
+	{
+		modes = { "n" },
+		lhs = "gl",
+		rhs = function()
+			vim.diagnostic.open_float()
+		end,
+		opts = { desc = "Show diagnostic in floating window" },
+	},
 }
 
 local map = vim.keymap.set
