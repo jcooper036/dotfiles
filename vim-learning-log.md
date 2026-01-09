@@ -48,6 +48,14 @@ Add, delete, change surrounding characters.
 - `<leader>kk` → search "surround"
 - **Search terms:** `:help nvim-surround`
 
+### Search and Find
+- `*` / `#` - Search forward/backward for word under cursor (whole word)
+- `g*` / `g#` - Search forward/backward for word under cursor (partial match)
+- `n` / `N` - Next/previous match
+- `/pattern` - Search forward for pattern
+- `?pattern` - Search backward for pattern
+- **Search terms:** `:help *`, `:help g*`, `:help search-commands`
+
 ### Find and Replace
 - `:%s/old/new/g` - whole file
 - `:%s/old/new/gc` - with confirmation
@@ -101,7 +109,9 @@ Recording keystrokes to replay.
 - `` `m `` - Jump back to exact position of mark 'm'
 - `Ctrl-o` - Jump back in jump list (previous location)
 - `Ctrl-i` - Jump forward in jump list
-- **Search terms:** `:help marks`, `:help jumplist`
+- `:jumps` - View jump list history
+- **Key concept:** Jumps (like `gd`, `/`, `G`, `%`) add to jump list. Motions (like `j`, `w`, `{`) don't.
+- **Search terms:** `:help marks`, `:help jumplist`, `:help jump-motions`
 
 ### Scrolling and Big Movements
 - `Ctrl-d` / `Ctrl-u` - Down/Up half a page (most common)
@@ -109,6 +119,39 @@ Recording keystrokes to replay.
 - `{number}j` / `{number}k` - Move exact line count (e.g., `10j`)
 - `}` / `{` - Jump by paragraph (blank line separated)
 - **Search terms:** `:help CTRL-D`, `:help scroll-cursor`, `:help {`
+
+### Delete and Put Commands
+- `x` - delete character under cursor (like Del)
+- `X` - delete character before cursor (like Backspace)
+- `s` - substitute character (delete + insert mode)
+- `r{char}` - replace character with {char}
+- `p` - put (paste) AFTER cursor / BELOW line
+- `P` - put (paste) BEFORE cursor / ABOVE line
+- **Key concept:** Linewise yanks (`dd`, `yy`) paste on new lines. Characterwise yanks (`yw`, `diw`) paste inline.
+- **Search terms:** `:help x`, `:help p`, `:help P`
+
+### Text Objects (Inner vs Around)
+Operate on "the thing you're in" from anywhere in it. Pattern: `{operator}{i/a}{text-object}`
+- `i` (inner) - the thing WITHOUT surrounding delimiters/whitespace
+- `a` (around) - the thing WITH its delimiters/whitespace
+
+**Common text objects:**
+- `iw` / `aw` - inner/around word
+- `i"` / `a"` - inside/around quotes (also works with `'` and `` ` ``)
+- `i(` / `a(` - inside/around parens (also `i)` / `a)`)
+- `i{` / `a{` - inside/around braces (also `i}` / `a}`)
+- `i[` / `a[` - inside/around brackets (also `i]` / `a]`)
+- `it` / `at` - inside/around HTML/XML tag
+- `ip` / `ap` - inner/around paragraph
+
+**Examples:**
+- `ciw` - change whole word from anywhere in the word
+- `di"` - delete text inside quotes (keep quotes)
+- `da"` - delete text and the quotes
+- `yip` - yank paragraph
+- `vi{` - visually select inside braces
+
+**Search terms:** `:help text-objects`, `:help iw`, `:help aw`
 
 ---
 
