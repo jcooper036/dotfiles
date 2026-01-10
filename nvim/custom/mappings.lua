@@ -43,6 +43,11 @@ local C = {
 				request = "launch",
 				name = "Launch file",
 				program = "${file}",
+				cwd = vim.fn.getcwd(),
+				env = {
+					PYTHONPATH = vim.fn.getcwd(),
+				},
+				console = "integratedTerminal",
 			})
 		end,
 		opts = { desc = "DAP Debug run current file" },

@@ -102,7 +102,21 @@ local plugins = {
 		ft = "python",
 		dependencies = { "mfussenegger/nvim-dap" },
 		config = function()
-			require("dap-python").setup("python") -- uses project's venv
+			local dap = require("dap")
+			local dappython = require("dap-python")
+			dappython.setup("python")
+
+			table.insert(dap.configurations.python, {
+				type = "python",
+				request = "launch",
+				name = "Python: Launch with Root",
+				program = "${file}",
+				cwd = vim.fn.getcwd(),
+				env = {
+					PYTHONPATH = vim.fn.getcwd(),
+				},
+				console = "integratedTerminal",
+			})
 		end,
 	},
 	-- Inline variable values with debugger
