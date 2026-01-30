@@ -85,6 +85,24 @@ Recording keystrokes to replay.
 - `:bd pattern*` - close buffers matching pattern
 - **Search terms:** `:help :bdelete`, `:help :buffers`
 
+### Window Management
+**Core concept:** Buffers are files in memory. Windows are viewports that display buffers.
+
+**Navigation:**
+- `<C-w>h/j/k/l` - Move between windows (vim directions)
+- `<C-w>w` - Cycle through windows
+
+**Closing:**
+- `<C-w>c` or `:close` - Close window (keeps buffer alive)
+- `<C-w>o` - Close all OTHER windows (only-one)
+- `:bd` - Close buffer (closes all windows showing it)
+
+**Splitting:**
+- `<C-w>s` - Split horizontally
+- `<C-w>v` - Split vertically
+
+**Search terms:** `:help windows`, `:help CTRL-W`, `:help window-resize`
+
 ### Terminal Management
 - `<leader>v` / `<leader>h` / `<leader>i` - Toggle Vertical/Horizontal/Floating terminal
 - `<C-x>` - Escape terminal mode to normal mode (NvChad default)
