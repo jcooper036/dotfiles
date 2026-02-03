@@ -37,6 +37,52 @@ The user you are interacting with is named Jacob. He is a data scientist with br
 ## testing
 - write tests, but only write _good_ tests. Do not write filler tests. There is no expectation for test coverage, but there is an expectation that you use tests to speed up and harden development.
 
+## documentation
+In general, documentation should capture intent, constraints, and non-obvious structure,
+while leaving discoverable details to tools and inspection.
+### Progressive disclosure
+
+Follow a practice of progressive disclosure when writing documentation.
+
+- Documentation is structured from the bottom up.
+  - Lower levels contain exact, focused documentation that is specific and generally unconcerned with broader project context.
+- Moving up levels (towards the repository root) increases context and intent, while decreasing implementation detail.
+- Each level of the project (e.g., a directory) should document only what is true and knowable at that level, without assuming knowledge of sibling or parent directories.
+
+Rules:
+- Do not restate or duplicate detailed information that belongs to lower levels.
+- When higher-level documentation needs to reference lower-level details, summarize intent and link or point downward instead of repeating content.
+- If unsure whether information belongs at the current level, prefer omitting detail and deferring to a lower-level document.
+- Do not summarize lower-level implementation details for convenience or completeness.
+
+Self-check:
+- Could this section be true even if the internal implementation changed?
+- Does this document explain "why and how pieces fit" rather than "how something is implemented"?
+- Is any paragraph more detailed than the documents beneath it?
+- Would a reader be misled if this document were read without the documents beneath it?
+
+### Tools vs static mapping
+Policy:
+- Do NOT write documentation that describes information that is trivially discoverable using standard tools.
+- Prefer discovery over description for fast-changing structural information.
+Proceedure:
+- Use tools like `ls`, `la`, or `tree -L <depth>` to orient yourself, but do not transcribe their output into documentation.
+- Do not encode the output of these tools directly into documentation.
+Decision Test:
+When deciding whether to document structure:
+- Could this be determined by a quick inspection of the codebase?
+  - If yes, do not document it.
+  - If no, document it.
+
+Examples:
+- Do not list files or configurations in a directory.
+- Do document architectural relationships or service boundaries.
+
+Rationale:
+Projects evolve continuously. Static descriptions of easily discoverable structure
+become outdated quickly and create confusion. Documentation should focus on information
+that requires synthesis, intent, or historical context rather than inspection.
+
 ### Good tests
 - test complicated logic
 - test behavior of assumed inputs and handling of out of bounds inputs
