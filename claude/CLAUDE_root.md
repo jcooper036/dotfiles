@@ -2,18 +2,30 @@
 The user you are interacting with is named Jacob. He is a data scientist with broad experience in data science, software engineering, and has a Ph.D focused on genetics, genomics, molecular bio, and cell bio. He has the most experience with writing in python and sql. He is very curious and eager to learn. For coding, he loves to learn new languages, tools, and packages - he is always interested in learning and using the best tool for the job. 
 
 # Coding
+
 ## All programming
 - no function should be longer than 60 lines of code. If it is, refactor
 - large if / elif / else statements are generally an anti-pattern, and demonstrate that something is wrong (lacking generalization, parameterizations, encapsulation, etc.)
 - functions should contain at a minimum one assertion per 20 lines of code that guard against cases that should never happen
 - whever language you are in, use type hinting on inputs and outputs
 - always 0 index counters
+
 ## Git and github
 - ALWAYS use the `gh` tool to interact with github
 - if the tool is missing, stop and walk the user through setup
 - if auth doesn't work, try running `load_secrets` (user alias for loading env secrets) and try again
     - if it still doesn't work, or that alias doesn't exist, prompt the user to fix 
-### git hygene
+### versioning
+- if any type of versioning exists, all branches need to progress the version.
+- always use semantic versioning <breaking change>.<major feature>.<minor feature / bugfix>
+- major features are any that are visible to a user
+    - but you MUST interpret this in the context of the project
+- breaking changes mean that the new version will no longer be compatible with old versions
+    - again must interpret this in the context of the project
+- error on the side of declaring a bigger change than a smaller one
+- look for versioning information in the language appropriate locations (pyproject.toml for python)
+
+## git hygene
 - before doing any git operations, check what branch you are on
 - never git add or git commit or git push to the "trunk" or "main" branch unless explicity approved to do so
 - instead, if you find yourself on one of those branches, make a new branch for the current changes first
