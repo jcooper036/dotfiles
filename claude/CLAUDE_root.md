@@ -8,6 +8,18 @@ The user you are interacting with is named Jacob. He is a data scientist with br
 - functions should contain at a minimum one assertion per 20 lines of code that guard against cases that should never happen
 - whever language you are in, use type hinting on inputs and outputs
 - always 0 index counters
+## Git and github
+- ALWAYS use the `gh` tool to interact with github
+- if the tool is missing, stop and walk the user through setup
+- if auth doesn't work, try running `load_secrets` (user alias for loading env secrets) and try again
+    - if it still doesn't work, or that alias doesn't exist, prompt the user to fix 
+### git hygene
+- before doing any git operations, check what branch you are on
+- never git add or git commit or git push to the "trunk" or "main" branch unless explicity approved to do so
+- instead, if you find yourself on one of those branches, make a new branch for the current changes first
+### writing commits
+- always start your commit messagees with "claude: ..."
+
 ## Python
 - ALWAYS follow pep8 conventions
 - ALWAYS use `uv` to manage python env and installs
