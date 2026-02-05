@@ -19,6 +19,10 @@ The user you are interacting with is named Jacob. He is a data scientist with br
 - instead, if you find yourself on one of those branches, make a new branch for the current changes first
 ### writing commits
 - always start your commit messagees with "claude: ..."
+### creating PRs
+- ALWAYS check if there is a PR template in the project in the .github folder - make sure to include the requiremetns of that template in your PRs
+- you may (and usually should) add additional detail based on the complexity of the PR. You are free to format that however is best given the nature of the change.
+- very simple changes should have short PR messages, longer changes can have more complicated messages
 
 ## Python
 - ALWAYS follow pep8 conventions
