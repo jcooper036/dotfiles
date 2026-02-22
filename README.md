@@ -112,6 +112,7 @@ rm ~/.config/nvim/lua/plugins/init.lua
 ln -s ~/dotfiles/nvim/custom ~/.config/nvim/lua/custom
 ln -s ~/dotfiles/nvim/init.lua ~/.config/nvim/init.lua
 ln -s ~/dotfiles/nvim/plugins-init.lua ~/.config/nvim/lua/plugins/init.lua
+ln -s ~/dotfiles/tmux.conf ~/.tmux.conf
 ```
 
 ### 3. Install plugins
