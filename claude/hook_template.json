@@ -1,0 +1,25 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '## running pytest: TESTS MUST PASS in 2seconds or less' && pytest -q"
+          },
+
+          {
+            "type": "command",
+            "command": "echo '## running ty: MUST PASS WITH NO ISSUE' && ty check ."
+          },
+
+          {
+            "type": "command",
+            "command": "echo '## running ruff: MUST PASS WITH NO ISSUE' && ruff check . --fix"
+          }
+        ]
+      }
+    ]
+  }
+}
