@@ -111,6 +111,11 @@ Projects evolve continuously. Static descriptions of easily discoverable structu
 become outdated quickly and create confusion. Documentation should focus on information
 that requires synthesis, intent, or historical context rather than inspection.
 
+### Documentation honesty
+- **Never fabricate empirical data.** examples: Runtime estimates, convergence curves, benchmark numbers, costs, wall time, concetrations, mass, and scaling figures must come from actual measurements 
+- If empirical data is required by a documentation standard but has not been measured yet, write `[incomplete]` as a placeholder. Do not fill the gap with estimates.
+
+## Test Writing
 ### Good tests
 - test complicated logic
 - test behavior of assumed inputs and handling of out of bounds inputs
