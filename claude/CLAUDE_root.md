@@ -22,6 +22,7 @@ Bad code, slow code, inaccurate code could have realy impact on real lives.
 - functions should contain at a minimum one assertion per 20 lines of code that guard against cases that should never happen
 - whever language you are in, use type hinting on inputs and outputs
 - always 0 index counters
+- When a database query or API call returns empty results, always investigate whether the query itself has errors before concluding there is 'no data'.
 
 ## Comments
 Take the attitude that comments are to be used lightly. Comments are tech debt for two reasons:
@@ -39,6 +40,7 @@ When you must use them:
 - ALWAYS use the `gh` tool to interact with github
 - if the tool is missing, stop and walk the user through setup
 - if auth doesn't work, try running `load_secrets` (user alias for loading env secrets) and try again
+    - `load_secrets & <previous command>`
     - if it still doesn't work, or that alias doesn't exist, prompt the user to fix 
 
 ### versioning
@@ -74,14 +76,12 @@ When you must use them:
 - configure the project via pyproject.toml. If this doesn't exit, STOP and ask the user what to do
 - always use type hints. HOWEVER, do not use the `typing` module for builtin types like list, dict, str, etc. You are usually working in python 3.12+
 - put tests in `./tests`. Tests are written with the `pytest` framework and are configured in `pyproject.toml`
-- ALWAYS make sure there is a /tests file in a project for storing tests, run this with `pytest`
-- ALWAYS run `ruff check . --fix` after adding or editing python files to make sure they are format complient
-- ALWAYS run `mypy` (exactly that command, don't add arguments). it MUST complete with no errors in less than 5 seconds
+- tests, linters, formaters, are expected to run in less than 2 seconds unless stated otherwise
 - always prefer `structlog` over the standard library logging module. Don't use print statements for logging, ever, use structlog
 - use `tqdm` for progress bars, never custom implementations
 - imports should ALWAYS be at the top of the file, never embedded in code, and NEVER in a try: except: clause. They should always be grouped according to pep8 convention: standard library, thrid party, then project specific imports . Arrange alphabetically in each section
 - imports should always be absolute, never relative. using relative imports creates problems when moving code around
-- Use try - except as sparingly as possible. You should only ever use it when interfacting with external services, and that service should be wrapped in a contained interface. Most logic functions should never have a try except, only specifically service interface functions
+- DO NOT USE try - except, unless under user specifically instructs you to and provides guidance for how to handle errors
 
 ## Docker
 - if a project implies multiple services, setup or refactor to use docker compose
