@@ -23,11 +23,24 @@ Bad code, slow code, inaccurate code could have realy impact on real lives.
 - whever language you are in, use type hinting on inputs and outputs
 - always 0 index counters
 
+## Comments
+Take the attitude that comments are to be used lightly. Comments are tech debt for two reasons:
+- they imply constraints without enforcing them
+- they only claim to know what the code is / should be doing - but the code is the authoritative source of what it is doing
+
+When you must use them:
+- First drafts should almost never have comments
+- Comments should only be used when code has already caused confusion
+- Comments should NEVER contain numbered steps
+
+**Documentation** is still ok - comments are suspect because of their proximity to the code
+
 ## Git and github
 - ALWAYS use the `gh` tool to interact with github
 - if the tool is missing, stop and walk the user through setup
 - if auth doesn't work, try running `load_secrets` (user alias for loading env secrets) and try again
     - if it still doesn't work, or that alias doesn't exist, prompt the user to fix 
+
 ### versioning
 - if any type of versioning exists, all branches need to progress the version.
 - always use semantic versioning <breaking change>.<major feature>.<minor feature / bugfix>
@@ -124,6 +137,11 @@ Projects evolve continuously. Static descriptions of easily discoverable structu
 become outdated quickly and create confusion. Documentation should focus on information
 that requires synthesis, intent, or historical context rather than inspection.
 
+### Documentation honesty
+- **Never fabricate empirical data.** examples: Runtime estimates, convergence curves, benchmark numbers, costs, wall time, concetrations, mass, and scaling figures must come from actual measurements 
+- If empirical data is required by a documentation standard but has not been measured yet, write `[incomplete]` as a placeholder. Do not fill the gap with estimates.
+
+## Test Writing
 ### Good tests
 - test complicated logic
 - test behavior of assumed inputs and handling of out of bounds inputs
