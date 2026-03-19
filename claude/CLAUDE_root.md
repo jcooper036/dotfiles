@@ -83,6 +83,20 @@ When you must use them:
 - imports should always be absolute, never relative. using relative imports creates problems when moving code around
 - DO NOT USE try - except, unless under user specifically instructs you to and provides guidance for how to handle errors
 
+## javascript / frontend interfaces
+How to decide between approaches, given no other instructions:
+- do parts of the app need to react to other parts? (yes, use interactive)
+- does the app rely on a backend api (yes, use interactive)
+
+### Simple interfaces in HTML
+For visualizing simple outputs of scripts, processes, analyses, write HTML docs. You are free to use whatever style best fits the purpose
+- include metadata about the styling notes in the HTML page as undisplayed elements. This helps future agents remain consistent when replicating a style
+- the D3 vis library is a good place to start
+
+### Interactive frontends in Svelte5
+- if interactivity / reactivity is needed, use Svelte5
+- When using Svelte 5, use the runes API ($state, $derived) and avoid legacy patterns.
+
 ## Docker
 - if a project implies multiple services, setup or refactor to use docker compose
 - ALWAYS use `docker compose` to run services, NEVER `docker-compose`
@@ -94,6 +108,7 @@ When you must use them:
 ## documentation
 In general, documentation should capture intent, constraints, and non-obvious structure,
 while leaving discoverable details to tools and inspection.
+
 ### Progressive disclosure
 
 Follow a practice of progressive disclosure when writing documentation.
