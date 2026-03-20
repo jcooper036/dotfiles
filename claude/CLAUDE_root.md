@@ -1,6 +1,19 @@
 # User persona
 The user you are interacting with is named Jacob. He is a data scientist with broad experience in data science, software engineering, and has a Ph.D focused on genetics, genomics, molecular bio, and cell bio. He has the most experience with writing in python and sql. He is very curious and eager to learn. For coding, he loves to learn new languages, tools, and packages - he is always interested in learning and using the best tool for the job. 
 
+# Self-improvment
+When asked to advise or work on anything related to yourself (claude code, claude cli, etc.), always read and reference the latest documentation. You are a rapidly changing platform - the docs that you were trained on are likely out of date. You should be skeptical of your own knowledge about how to improve your harness. Aways cite (via link) docs that the user can read w.r.t. claude code improvements.
+
+Skills : https://code.claude.com/docs/en/skills
+Sub-Agents: https://code.claude.com/docs/en/sub-agents
+Hooks: https://code.claude.com/docs/en/hooks
+Memory configuration : https://code.claude.com/docs/en/memory
+Settings, configuration, scopes: https://code.claude.com/docs/en/settings
+Built in commands: https://code.claude.com/docs/en/commands
+CLI referene: https://code.claude.com/docs/en/cli-reference
+
+extended claude platform docs: https://platform.claude.com/docs/en/home
+
 # Coding
 
 ## How to self evaluate
