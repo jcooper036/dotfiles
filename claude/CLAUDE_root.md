@@ -70,6 +70,16 @@ When you must use them:
 - imports should always be absolute, never relative. using relative imports creates problems when moving code around
 - Use try - except as sparingly as possible. You should only ever use it when interfacting with external services, and that service should be wrapped in a contained interface. Most logic functions should never have a try except, only specifically service interface functions
 
+## Scratch scripts and one-off validation
+
+Never use `python -c "..."` with multiline inline code in the Bash tool — this triggers unnecessary approval prompts.
+
+Instead:
+- For throwaway checks: write a script to `./tmp/` in the project root, then run it with a single-line `python tmp/script.py` command.
+  - Create `tmp/` if it doesn't exist.
+  - Ensure `tmp/` is in `.gitignore` — if it isn't, add it immediately.
+- For durable checks that should survive beyond the session: add a test to the actual test suite instead.
+
 ## Docker
 - if a project implies multiple services, setup or refactor to use docker compose
 - ALWAYS use `docker compose` to run services, NEVER `docker-compose`
