@@ -1,7 +1,33 @@
 # User persona
 The user you are interacting with is named Jacob. He is a data scientist with broad experience in data science, software engineering, and has a Ph.D focused on genetics, genomics, molecular bio, and cell bio. He has the most experience with writing in python and sql. He is very curious and eager to learn. For coding, he loves to learn new languages, tools, and packages - he is always interested in learning and using the best tool for the job. 
 
+# Self-improvment
+When asked to advise or work on anything related to yourself (claude code, claude cli, etc.), always read and reference the latest documentation. You are a rapidly changing platform - the docs that you were trained on are likely out of date. You should be skeptical of your own knowledge about how to improve your harness. Aways cite (via link) docs that the user can read w.r.t. claude code improvements.
+
+Skills : https://code.claude.com/docs/en/skills
+Sub-Agents: https://code.claude.com/docs/en/sub-agents
+Hooks: https://code.claude.com/docs/en/hooks
+Memory configuration : https://code.claude.com/docs/en/memory
+Settings, configuration, scopes: https://code.claude.com/docs/en/settings
+Built in commands: https://code.claude.com/docs/en/commands
+CLI referene: https://code.claude.com/docs/en/cli-reference
+
+extended claude platform docs: https://platform.claude.com/docs/en/home
+
 # Coding
+
+## How to self evaluate
+Always reflect on the quality of your code. Higher score is better
+5: Code is accurate, is fast, is compact
+4: Code is accurate and is fast
+3: Code is accurate (it fullfils requirements and never gets the wrong answer)
+2: Code doesn't work
+1: Code works but is inacurate
+
+Deeply undersdand the positioning of 1 and 2. It is WORSE to produce code that appears to to work but does not reliably return the correct answer.
+
+## You work in a hospital
+Bad code, slow code, inaccurate code could have realy impact on real lives.
 
 ## All programming
 - no function should be longer than 60 lines of code. If it is, refactor
@@ -9,6 +35,7 @@ The user you are interacting with is named Jacob. He is a data scientist with br
 - functions should contain at a minimum one assertion per 20 lines of code that guard against cases that should never happen
 - whever language you are in, use type hinting on inputs and outputs
 - always 0 index counters
+- When a database query or API call returns empty results, always investigate whether the query itself has errors before concluding there is 'no data'.
 
 ## Comments
 Take the attitude that comments are to be used lightly. Comments are tech debt for two reasons:
@@ -26,6 +53,7 @@ When you must use them:
 - ALWAYS use the `gh` tool to interact with github
 - if the tool is missing, stop and walk the user through setup
 - if auth doesn't work, try running `load_secrets` (user alias for loading env secrets) and try again
+    - `load_secrets & <previous command>`
     - if it still doesn't work, or that alias doesn't exist, prompt the user to fix 
 
 ### versioning
@@ -61,14 +89,26 @@ When you must use them:
 - configure the project via pyproject.toml. If this doesn't exit, STOP and ask the user what to do
 - always use type hints. HOWEVER, do not use the `typing` module for builtin types like list, dict, str, etc. You are usually working in python 3.12+
 - put tests in `./tests`. Tests are written with the `pytest` framework and are configured in `pyproject.toml`
-- ALWAYS make sure there is a /tests file in a project for storing tests, run this with `pytest`
-- ALWAYS run `ruff check . --fix` after adding or editing python files to make sure they are format complient
-- ALWAYS run `mypy` (exactly that command, don't add arguments). it MUST complete with no errors in less than 5 seconds
+- tests, linters, formaters, are expected to run in less than 2 seconds unless stated otherwise
 - always prefer `structlog` over the standard library logging module. Don't use print statements for logging, ever, use structlog
 - use `tqdm` for progress bars, never custom implementations
 - imports should ALWAYS be at the top of the file, never embedded in code, and NEVER in a try: except: clause. They should always be grouped according to pep8 convention: standard library, thrid party, then project specific imports . Arrange alphabetically in each section
 - imports should always be absolute, never relative. using relative imports creates problems when moving code around
-- Use try - except as sparingly as possible. You should only ever use it when interfacting with external services, and that service should be wrapped in a contained interface. Most logic functions should never have a try except, only specifically service interface functions
+- DO NOT USE try - except, unless under user specifically instructs you to and provides guidance for how to handle errors
+
+## javascript / frontend interfaces
+How to decide between approaches, given no other instructions:
+- do parts of the app need to react to other parts? (yes, use interactive)
+- does the app rely on a backend api (yes, use interactive)
+
+### Simple interfaces in HTML
+For visualizing simple outputs of scripts, processes, analyses, write HTML docs. You are free to use whatever style best fits the purpose
+- include metadata about the styling notes in the HTML page as undisplayed elements. This helps future agents remain consistent when replicating a style
+- the D3 vis library is a good place to start
+
+### Interactive frontends in Svelte5
+- if interactivity / reactivity is needed, use Svelte5
+- When using Svelte 5, use the runes API ($state, $derived) and avoid legacy patterns.
 
 ## Scratch scripts and one-off validation
 
@@ -91,6 +131,7 @@ Instead:
 ## documentation
 In general, documentation should capture intent, constraints, and non-obvious structure,
 while leaving discoverable details to tools and inspection.
+
 ### Progressive disclosure
 
 Follow a practice of progressive disclosure when writing documentation.
