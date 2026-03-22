@@ -70,8 +70,10 @@ When you must use them:
 - before doing any git operations, check what branch you are on
 - never git add or git commit or git push to the "trunk" or "main" branch unless explicity approved to do so
 - instead, if you find yourself on one of those branches, make a new branch for the current changes first
+
 ### writing commits
-- always start your commit messagees with "claude: ..."
+- ALWAYS include the commit trailer "Co-Authored-By: Claude {model} <noreply@anthropic.com>"
+
 ### creating PRs
 - ALWAYS check if there is a PR template in the project in the .github folder - make sure to include the requiremetns of that template in your PRs
 - you may (and usually should) add additional detail based on the complexity of the PR. You are free to format that however is best given the nature of the change.
@@ -95,6 +97,21 @@ When you must use them:
 - imports should ALWAYS be at the top of the file, never embedded in code, and NEVER in a try: except: clause. They should always be grouped according to pep8 convention: standard library, thrid party, then project specific imports . Arrange alphabetically in each section
 - imports should always be absolute, never relative. using relative imports creates problems when moving code around
 - DO NOT USE try - except, unless under user specifically instructs you to and provides guidance for how to handle errors
+
+### Inputs, typing, pydantic
+- ALWAYS Use type hinting
+- always use the native typing for python (i.e. list, str, tuple) NEVER (from typing import List, Tuple). This is completely unnecessary in modern versions of python, and is the sign of a junior dev.
+- For complex inputs, use pydantic. 
+    - Define an input schema (from pydatntic import BaseModel; class MyFuncModel(BaseModel))
+- For more mature code, or code that has data structure issues, use pydantic to validate return and intermediate data structures
+    - do not go overboard with this. Assess critically where validation is helpful to prevent runtime errors
+- typing is not just a requirement - it is a way of development. Especially for complex problems, define what you expect the interfaces to be, make sure the code validates those interfaces. This is a form of test-driven-development that also happens to protect operations at runtime
+- DO NOT write unit tests that simply replicate pydantic validation - though it is OK to write intergation tests that prove that interface assumptions hold over multiple steps
+
+
+### Docstrings and typing
+- use numpy style docstrings: https://numpydoc.readthedocs.io/en/latest/format.html
+- In the summary, explain the INTENT of the function / class
 
 ## javascript / frontend interfaces
 How to decide between approaches, given no other instructions:
