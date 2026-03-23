@@ -77,25 +77,46 @@ The worker subagent should:
     - read add docs related to the code that they intend to modify
     - assume that docs are constructed in a pattern of progressive disclosure - the closer to the source code the docs are the more details, and the further up the tree the more general context
     - plan to update any relevant docs as part of their tasks
+3. Run pytest, ruff, and mypy
+```bash
+pytest -v
+ruff format .
+ruff check . --fix
+mypy
+```
 3. Commit with message: `claude: {description} (fixes #{number})`
 4. Push the branch to remote
-5. Create a PR using:
+5. Create a PR — you MUST use the exact body format defined in the **REQUIRED PR Body Format** section below
+
+### REQUIRED PR Body Format
+
+Every PR body MUST follow this exact structure. Do not omit any section. Do not rearrange. Use the HEREDOC pattern to preserve formatting.
+
 ```bash
 gh pr create --repo <owner/repo> \
   --title "{Description} (fixes #{number})" \
-  --label agent-generated --label autonomous \
-  --body "Fixes #{number}
+  --label agent-created --label autonomous \
+  --body "$(cat <<'EOF'
+Fixes #{number}
 
-{Description of what was done}
+{Description of what was done — 1-3 sentences summarizing the change and why}
 
 ---
 *This PR was created by the Vigilant Watch of Brother Claudius of the Nominations Chapter*
 
 **Reviewer instructions**: Please either:
 - Accept this PR if the fix is complete and correct, OR
-- Update issue #{number} to better refine the problem, then close this PR" \
+- Update issue #{number} to better refine the problem, then close this PR
+EOF
+)" \
   --reviewer <reviewer-username>
 ```
+
+**Non-negotiable rules for the PR body:**
+- The first line MUST be `Fixes #{number}`
+- The description MUST explain what was done and why, not just restate the issue title
+- The attribution line and reviewer instructions block MUST be included verbatim
+- Do NOT add extra sections, headers, or formatting beyond what is shown above
 
 ### Step 5: Return to Original State
 **CRITICAL**: After ALL subagents complete, switch back to the trunk/main branch:
