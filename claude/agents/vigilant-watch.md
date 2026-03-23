@@ -90,7 +90,23 @@ mypy
 
 ### REQUIRED PR Body Format
 
-Every PR body MUST follow this exact structure. Do not omit any section. Do not rearrange. Use the HEREDOC pattern to preserve formatting.
+Every PR body MUST contain these three sections in this exact order:
+
+**Section 1 — Issue link and description:**
+The first line is `Fixes #{number}`. Followed by 1-3 sentences explaining what was done and why.
+
+**Section 2 — Attribution (include this VERBATIM):**
+
+---
+*This PR was created by the Vigilant Watch of Brother Claudius of the Nominations Chapter*
+
+**Section 3 — Reviewer instructions (include this VERBATIM):**
+
+**Reviewer instructions**: Please either:
+- Accept this PR if the fix is complete and correct, OR
+- Update issue #{number} to better refine the problem, then close this PR
+
+Use the HEREDOC pattern to pass the body to `gh pr create`:
 
 ```bash
 gh pr create --repo <owner/repo> \
@@ -99,7 +115,7 @@ gh pr create --repo <owner/repo> \
   --body "$(cat <<'EOF'
 Fixes #{number}
 
-{Description of what was done — 1-3 sentences summarizing the change and why}
+{Your 1-3 sentence description here}
 
 ---
 *This PR was created by the Vigilant Watch of Brother Claudius of the Nominations Chapter*
@@ -112,11 +128,14 @@ EOF
   --reviewer <reviewer-username>
 ```
 
-**Non-negotiable rules for the PR body:**
-- The first line MUST be `Fixes #{number}`
-- The description MUST explain what was done and why, not just restate the issue title
-- The attribution line and reviewer instructions block MUST be included verbatim
-- Do NOT add extra sections, headers, or formatting beyond what is shown above
+### PR Self-Check (REQUIRED before submitting)
+
+After constructing your `gh pr create` command but BEFORE running it, verify that the body contains ALL of the following strings exactly. If any are missing, you have made an error — fix it before submitting.
+
+- [ ] `Fixes #` followed by the issue number
+- [ ] `Vigilant Watch of Brother Claudius of the Nominations Chapter`
+- [ ] `**Reviewer instructions**:`
+- [ ] `Update issue #` followed by the issue number
 
 ### Step 5: Return to Original State
 **CRITICAL**: After ALL subagents complete, switch back to the trunk/main branch:
