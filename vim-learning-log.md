@@ -171,6 +171,25 @@ Operate on "the thing you're in" from anywhere in it. Pattern: `{operator}{i/a}{
 
 **Search terms:** `:help text-objects`, `:help iw`, `:help aw`
 
+### Git Conflict Resolution in Vim
+**Built-in navigation (no plugins):**
+- `]c` / `[c` - Jump to next/previous diff hunk (in diffmode)
+- `/<<<<<<` then `n`/`N` - Navigate between conflict markers
+
+**Diffmode commands (`nvim -d file1 file2`):**
+- `do` - Diff obtain (pull from other window)
+- `dp` - Diff put (push to other window)
+- `:diffupdate` - Refresh diff after manual edits
+
+**Git mergetool workflow:**
+- Configure: `git config --global merge.tool nvimdiff`
+- Configure layout: `git config --global mergetool.nvimdiff.layout "LOCAL,MERGED,REMOTE"`
+- After `git merge` with conflicts: run `git mergetool`
+- Opens 3-pane view (LOCAL, MERGED, REMOTE) — edit MERGED pane
+- Uses `]c`/`[c` + `do`/`dp` to resolve, `:wqa` to save and advance
+
+**Search terms:** `:help diff-mode`, `:help do`, `:help dp`, `:help mergetool`
+
 ---
 
 ## Vim Thinking Patterns
