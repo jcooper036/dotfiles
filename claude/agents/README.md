@@ -1,8 +1,6 @@
-# Vigilant Watch Agent
+# Git Issue Solver Agent 
 
 A Claude Code subagent that monitors GitHub repository issues and automatically creates PRs to fix issues labeled `autonomous` that don't yet have open PRs.
-
-PRs are attributed to **Brother Claudius of the Nominations Chapter**.
 
 ## Setup
 
@@ -29,7 +27,7 @@ The settings file grants permission for:
 From the target repository (with `settings.local.json` in `.claude/`):
 
 ```
-@"vigilant-watch (agent)"
+@"git-issue-solver (agent)"
 ```
 
 Or on a recurring schedule:
