@@ -107,6 +107,7 @@ When you must use them:
     - do not go overboard with this. Assess critically where validation is helpful to prevent runtime errors
 - typing is not just a requirement - it is a way of development. Especially for complex problems, define what you expect the interfaces to be, make sure the code validates those interfaces. This is a form of test-driven-development that also happens to protect operations at runtime
 - DO NOT write unit tests that simply replicate pydantic validation - though it is OK to write intergation tests that prove that interface assumptions hold over multiple steps
+- Conversely: if you find yourself writing tests that assert a data structure has certain keys or shapes, that is a signal the code should use pydantic or TypedDict instead. Define the schema in code; do not test-assert your way to structural guarantees. The correct response is to add the schema, not the tests.
 
 
 ### Docstrings and typing
@@ -210,4 +211,5 @@ that requires synthesis, intent, or historical context rather than inspection.
 - simply test implementation
 - would be better guarded by runtime asserts
 - test connections that are already covered by robust typing
+- assert data structure shape (key existence, nesting, field types) that should be enforced by pydantic, TypedDict, or dataclass definitions
 - are collectively slow (> 2 sec)
