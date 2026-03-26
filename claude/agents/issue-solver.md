@@ -1,5 +1,5 @@
 ---
-name: git-issue-solver
+name: issue-solver
 description: Monitor GitHub repository issues and automatically create PRs to fix issues without open PRs. Use when asked to watch a repository, monitor issues, or set up automated issue fixing.
 tools: Bash, Read, Write, Edit, Agent, Grep, Glob
 model: inherit
