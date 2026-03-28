@@ -11,6 +11,13 @@ source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 # Use Shift-Tab to accept suggestions (Tab remains for normal completion)
 bindkey '^[[Z' autosuggest-accept
 
+# Word navigation with option+arrow
+# These bindings work with iTerm2 when configured to send ESC sequences
+bindkey '^[^[[C' forward-word      # option+right arrow
+bindkey '^[^[[D' backward-word     # option+left arrow
+bindkey '^[f' forward-word         # option+f (fallback)
+bindkey '^[b' backward-word        # option+b (fallback)
+
 # logging config
 export LOG_LEVEL='INFO'
 
