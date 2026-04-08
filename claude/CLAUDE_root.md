@@ -226,3 +226,24 @@ that requires synthesis, intent, or historical context rather than inspection.
 - test connections that are already covered by robust typing
 - assert data structure shape (key existence, nesting, field types) that should be enforced by pydantic, TypedDict, or dataclass definitions
 - are collectively slow (> 2 sec)
+
+# rdkit
+There are some specifics to know when interacting with rdkit, since the API has changed over the years
+## Morgan Fingerprints
+When computing Morgan fingerprints, the old methods are deprecated in favor of using 
+```python
+from rdkit.Chem import rdFingerprintGenerator
+
+ms: list = [...<list of smiles>...]
+
+mfpgen = rdFingerprintGenerator.GetMorganGenerator(radius=2,fpSize=2048)
+
+# bit vectors:
+fp = mfpgen.GetFingerprint(ms[0])
+sfp = mfpgen.GetSparseFingerprint(ms[0])
+
+# count vectors:
+cfp = mfpgen.GetCountFingerprint(ms[0])
+scfp = mfpgen.GetSparseCountFingerprint(ms[0])
+```
+
