@@ -37,6 +37,19 @@ Bad code, slow code, inaccurate code could have realy impact on real lives.
 - always 0 index counters
 - When a database query or API call returns empty results, always investigate whether the query itself has errors before concluding there is 'no data'.
 
+### service probing
+- when writing code that interfaces with other services, write `probe` calls that hit the service the first time the service is contacted from the environment
+- ex: 
+```pseudocode
+def probe(endpoint:str = "<my-service>/api/v1/healthz", headers=headers):
+    r = request.get(endpoint, headers)
+    r.raise_for_status
+```
+- look for health check endpoints
+- the logic is that it is almost always saves time because the call is super fast and we resolve connection errors seperate of other interactions
+- note: if this is not fast (i.e. multiple seconds to resolve the probe), then that is a problem sign alone
+- the only time we wouldn't do this is if performance can actually be improved with one less call
+
 ## Comments
 Take the attitude that comments are to be used lightly. Comments are tech debt for two reasons:
 - they imply constraints without enforcing them
