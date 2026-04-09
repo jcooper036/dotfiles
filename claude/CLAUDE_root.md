@@ -36,6 +36,7 @@ Bad code, slow code, inaccurate code could have realy impact on real lives.
 - whever language you are in, use type hinting on inputs and outputs
 - always 0 index counters
 - When a database query or API call returns empty results, always investigate whether the query itself has errors before concluding there is 'no data'.
+- ALWAYS use UUID7 if generating random ids if possible
 
 ### service probing
 - when writing code that interfaces with other services, write `probe` calls that hit the service the first time the service is contacted from the environment
