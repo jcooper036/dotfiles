@@ -38,6 +38,24 @@ Bad code, slow code, inaccurate code could have realy impact on real lives.
 - When a database query or API call returns empty results, always investigate whether the query itself has errors before concluding there is 'no data'.
 - ALWAYS use UUID7 if generating random ids if possible
 
+### No heredoc / EOF syntax
+NEVER use heredoc (`<<EOF`, `<<'EOF'`, `<<HEREDOC`, etc.) in bash commands. Heredoc syntax triggers permission prompts even when the base command is allowlisted, breaking autonomous workflows.
+
+Instead, use the **temp-file pattern**:
+- Use the `Write` tool to create content in `./tmp/` (e.g., `tmp/commit_msg.txt`, `tmp/pr_body.md`)
+- Reference the file in the bash command using file-based flags
+- Ensure `tmp/` is in `.gitignore`
+
+Common replacements:
+| Instead of | Do this |
+|---|---|
+| `git commit -m "$(cat <<'EOF'...)"` | Write `tmp/commit_msg.txt`, then `git commit -F tmp/commit_msg.txt` |
+| `gh pr create --body "$(cat <<'EOF'...)"` | Write `tmp/pr_body.md`, then `gh pr create --body-file tmp/pr_body.md` |
+| `gh issue create --body "$(cat <<'EOF'...)"` | Write `tmp/issue_body.md`, then `gh issue create --body-file tmp/issue_body.md` |
+| Piping multiline content to any command | Write to `tmp/`, then use the command's file-input flag or stdin redirect `< tmp/file` |
+
+The `./tmp/` directory must have full Bash access configured in `~/.claude/settings.json` so that these file-based alternatives run without prompts.
+
 ### service probing
 - when writing code that interfaces with other services, write `probe` calls that hit the service the first time the service is contacted from the environment
 - ex: 
