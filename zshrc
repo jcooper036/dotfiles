@@ -113,4 +113,8 @@ export NVM_DIR="$HOME/.nvm"
 # Machine-specific config (not in git)
 [ -f ~/.zshrc.local ] && source ~/.zshrc.local
 
+# iterm2 shell integration
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh" || true
+
 # added since last time
+
