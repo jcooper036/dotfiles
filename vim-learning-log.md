@@ -190,6 +190,15 @@ Operate on "the thing you're in" from anywhere in it. Pattern: `{operator}{i/a}{
 
 **Search terms:** `:help diff-mode`, `:help do`, `:help dp`, `:help mergetool`
 
+### Shell Filtering (`!`)
+Pipe a range or visual selection through any shell command.
+- `:'<,'>!sort` - sort selected lines
+- `:'<,'>!sort -r` / `-u` / `-n` - reverse / unique / numeric sort
+- `:'<,'>!uniq` - remove consecutive duplicates
+- `:'<,'>!column -t` - align into columns
+- **Key concept:** `!` turns vim into a pipeline — any Unix tool becomes a text transformation
+- **Search terms:** `:help :!`, `:help filter`
+
 ---
 
 ## Vim Thinking Patterns
