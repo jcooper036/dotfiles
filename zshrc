@@ -2,6 +2,7 @@
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PYTHONPATH=".:$PYTHONPATH/Users/$USER"
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # load compinit (must come before any plugins that use compdef)
 autoload -Uz compinit && compinit
