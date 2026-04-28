@@ -28,6 +28,15 @@ vim.diagnostic.config({
   severity_sort = true,
 })
 
+-- Set commentstring for JSON files (JSON has no comments by spec,
+-- but // is the JSONC convention used by most modern tools)
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "json" },
+  callback = function()
+    vim.bo.commentstring = "// %s"
+  end,
+})
+
 -- Auto-show diagnostic float on cursor hold (after 500ms by default)
 vim.api.nvim_create_autocmd("CursorHold", {
   callback = function()
