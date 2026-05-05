@@ -77,7 +77,7 @@ Take the attitude that comments are to be used lightly. Comments are tech debt f
 When you must use them:
 - First drafts should almost never have comments
 - Comments should only be used when code has already caused confusion
-- Comments should NEVER contain numbered steps
+- Comments should NEVER contain numbered steps, "Step X", or "Phase X" labels. If you reorder code, these go stale. More importantly, needing them is a sign the code isn't well-organized — fix the architecture instead of labeling sections.
 
 **Documentation** is still ok - comments are suspect because of their proximity to the code
 
