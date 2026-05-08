@@ -1,35 +1,43 @@
 {
   "permissions": {
     "allow": [
-      "Bash(pwd)",
-      "Bash(git ls-remote *)",
-      "Bash(git checkout *)",
-      "Bash(git pull *)",
-      "Bash(git pull)",
-      "Bash(git push *)",
-      "Bash(git remote *)",
-      "Bash(git branch *)",
-      "Bash(git add *)",
-      "Bash(git commit *)",
-      "Bash(git worktree *)",
-      "Bash(git status *)",
-      "Bash(git status)",
-      "Bash(git diff *)",
-      "Bash(git diff)",
-      "Bash(git log *)",
-      "Bash(git log)",
-      "Bash(git rev-parse *)",
-      "Bash(git fetch *)",
-      "Bash(git fetch)",
-      "Bash(gh auth status)",
-      "Bash(gh issue list *)",
-      "Bash(gh issue comment *)",
-      "Bash(gh issue close *)",
-      "Bash(gh pr list *)",
-      "Bash(gh pr create *)",
-      "Bash(git check-ignore:*)",
-      "Bash(gh label *)",
-      "Bash(gh api *)"
-    ]
+      "Edit",
+      "Write",
+      "Read",
+      "WebFetch",
+      "WebSearch",
+      "Bash(git: *)"
+    ],
+    "defaultMode": "dontAsk"
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowedDomains": [
+        "github.com",
+        "api.github.com",
+        "*.prefect.cloud",
+        "oauth2.googleapis.com",
+        "us-east5-aiplatform.googleapis.com",
+        "downloads.claude.ai",
+        "api.anthropic.com"
+      ],
+      "allowAllUnixSockets": true
+    },
+    "filesystem": {
+      "allowWrite": [
+        "~/.cache/uv/",
+        "~/.ssh/sockets/"
+      ],    
+      "allowRead": [
+        "~/.claude/",
+        "/usr/bin",
+        "/usr/local/bin",
+        "/opt/homebrew/bin"
+      ]
+    },
+    "enableWeakerNetworkIsolation": true
   }
 }
