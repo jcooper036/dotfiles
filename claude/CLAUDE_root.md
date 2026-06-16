@@ -92,10 +92,6 @@ When you must use them:
 
 ## Git and github
 - ALWAYS use the `gh` tool to interact with github
-- if the tool is missing, stop and walk the user through setup
-- if auth doesn't work, try running `load_secrets` (user alias for loading env secrets) and try again
-    - `load_secrets & <previous command>`
-    - if it still doesn't work, or that alias doesn't exist, prompt the user to fix 
 
 ### versioning
 - if any type of versioning exists, all branches need to progress the version.

@@ -59,6 +59,7 @@ brew install starship
 brew install zoxide
 brew install nvim
 brew install zsh-autosuggestions
+brew install ripgrep
 ```
 
 ## Bring in this repo 

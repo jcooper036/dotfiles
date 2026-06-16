@@ -30,8 +30,6 @@ These rules prevent security-check permission prompts. Violating them causes the
 gh auth status
 ```
 
-If it fails: "GitHub auth missing. Run `load_secrets` or `gh auth login`." Stop.
-
 ---
 
 ## Step 1 — Find PRs to Review
