@@ -1,12 +1,25 @@
 # Claude configuration
 
 ## Files
-### CLAUDE_root.md
-- is meant to be symlinked to `~/CLAUDE.md`
+
+Run these commands to get symlinks setup correctly
 ```bash
 ln -s ~/dotfiles/claude/CLAUDE_root.md ~/.claude/CLAUDE.md
+ln -s ~/dotfiles/claude/statusline-command.sh ~/.claude/statusline-command.sh
 ```
+
+### CLAUDE_root.md
+- is meant to be symlinked to `~/CLAUDE.md`
 This should contain general practices to emulate across ALL machines and ALL projects.
+
+### Status line
+To get the statusline command to work, you need to add this to `~/.claude/settings.json`:
+```json
+"statusLine": {
+    "type": "command",
+    "command": "bash /Users/jacob/.claude/statusline-command.sh"
+}
+```
 
 ### CLAUDE_template.md
 This is a lightweight template based on the intent layers architecture: https://www.intent-systems.com/learn/intent-layer#turning-on-the-lights .  It follows a concept of progressive disclosure, where each part of a project has a CLAUDE.md file. 
