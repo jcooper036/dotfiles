@@ -155,6 +155,8 @@ When you must use them:
 How to decide between approaches, given no other instructions:
 - do parts of the app need to react to other parts? (yes, use interactive)
 - does the app rely on a backend api (yes, use interactive)
+*ALWAYS* perfer `bun` as the JavaScript / Typscript tool kit: https://bun.com/docs
+
 
 ### Simple interfaces in HTML
 For visualizing simple outputs of scripts, processes, analyses, write HTML docs. You are free to use whatever style best fits the purpose
