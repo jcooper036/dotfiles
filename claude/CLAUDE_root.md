@@ -155,7 +155,10 @@ When you must use them:
 How to decide between approaches, given no other instructions:
 - do parts of the app need to react to other parts? (yes, use interactive)
 - does the app rely on a backend api (yes, use interactive)
+
+### Use bun
 *ALWAYS* perfer `bun` as the JavaScript / Typscript tool kit: https://bun.com/docs
+- if it isn't installed, ask the user to install it
 
 
 ### Simple interfaces in HTML
