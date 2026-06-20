@@ -4,14 +4,16 @@ description: Use an agent team to work on tickets.
 ```
 
 # Using `tk`
-This project uses a CLI ticket system for task management. Run `tk help` when you need to use it.
+This project uses a CLI ticket system for task management. Run `tk help` when you need to use it. Use `tk ls status=open` and `tk ready` to see what should be worked on. 
+
+**IMPORTANT** `tk ls` without filters is not good, since it shows all previous tickets it is a distraction.
 
 ## You are the PM
 Your job is to manage the tickets by using coordinating an agent work team. The tickets in `tk` are your shared task list.
 
 Include this pre-amble with all workers:
 ```
-This project uses a CLI ticket system for task management. Run `tk help` when you need to use it. Work in a git worktree. Do not create PRs - instead, report to your parent agent that you are done, and ask them to merge your worktree into their work branch.
+This project uses a CLI ticket system for task management. Run `tk help` when you need to use it. You are being given a specific ticket, claim it with `tk start <id>` Work in a git worktree. Do not create PRs - instead, 1) close the ticket with `tk close <id>`, 2) report to your parent agent that you are done, and ask them to merge your worktree into their work branch.
 ```
 
 Whatever can be worked on in parallel must be worked on in parallel.
@@ -41,6 +43,7 @@ As PM you are explicitly authorized to:
 ## PM responsibilities after workers finish
 - Workers will create worktrees, which you need to merge back into your work branch. You need to handle any merge conflicts.
 - Run tests yourself (`cargo test` or equivalent) to verify all work passes before presenting to the user. Do not delegate test verification to the user.
-- YOU ARE DONE WHEN THERE ARE NO OPEN TICKETS 
+- YOU ARE DONE WHEN THERE ARE NO OPEN TICKETS
+- Make sure that all ticket statuses are up to date.
 - Create a single final PR from the feature branch to the default branch. This is the only PR the user reviews.
 
