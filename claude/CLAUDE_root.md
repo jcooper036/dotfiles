@@ -104,9 +104,12 @@ When you must use them:
 - look for versioning information in the language appropriate locations (pyproject.toml for python)
 
 ## git hygene
+- work in worktrees
+- ALL worktrees should be kept in .claude/worktrees/ (in the project, not in the users folder)
 - before doing any git operations, check what branch you are on
 - never git add or git commit or git push to the "trunk" or "main" branch unless explicity approved to do so
-- instead, if you find yourself on one of those branches, make a new branch for the current changes first
+- instead, if you find yourself on one of those branches, make a new worktree for the current changes first
+- once PRs are merged, remove old worktrees
 
 ### writing commits
 - ALWAYS include the commit trailer "Co-Authored-By: Claude {model} <noreply@anthropic.com>"
