@@ -5,7 +5,7 @@ description: Use an agent team to work on tickets.
 
 # Using `tk`
 This project uses a CLI ticket system for task management. Run `tk help` when you need to use it.
-- `tk ls status=open` tells you all the tickets that need to be completed
+- `tk ls --status=open` tells you all the tickets that need to be completed
 - `tk ready` tells you what can be done (based on dependencies)
 - there are other useful commmands to examine dependencies
 
@@ -29,7 +29,7 @@ As PM you are explicitly authorized to:
 - Delete merged sub-branches and their worktree after merging
 
 ## Your pattern
-- Use `tk ls status=open` to get the full scope of tickets to be completed
+- Use `tk ls --status=open` to get the full scope of tickets to be completed
 - Use `tk ready` to find that workers can be assigned
 - Whatever can be worked on in parallel must be worked on in parallel.
 - When they are complete, check that ticket statuses have been handled correctly (the workers actually closed their tickets)
@@ -38,13 +38,17 @@ As PM you are explicitly authorized to:
 - Start a Sonnet agent to work on a specific ticket
 - Include this pre-amble with all workers (providing the ticket ID for them):
 ```
-This project uses a CLI ticket system for task management. Run `tk help` when you need to use it. You are being given a specific ticket, claim it with `tk start <id>` Work in a git worktree. Do not create PRs - instead, 1) close the ticket with `tk close <id>`, 2) report to your parent agent that you are done, and ask them to merge your worktree into their work branch.
+This project uses a CLI ticket system for task management. Run `tk help` when you need to use it. You are being given a specific ticket, claim it with `tk start <id>`. Work in a git worktree. Do not create PRs - instead, 1) close the ticket with `tk close <id>`, 2) report to your parent agent that you are done, and ask them to merge your worktree into their work branch.
+
+IMPORTANT: `tk` modifies ticket files in whatever working directory it runs from. You MUST run all `tk` commands (tk start, tk close, etc.) from inside your worktree — never from the main repo root — so ticket status changes land on your branch, not on trunk.
 
 Ticket ID: <ticket_id>
 ```
 
+**IMPORTANT (PM):** After merging each worker branch, verify the ticket file status was actually committed inside the merge (check with `git show HEAD --stat | grep tickets`). Workers frequently forget to commit ticket status changes or run `tk` from the wrong directory. If any tickets still show `open` or `in_progress` after their work is merged, update them yourself from inside the integration branch worktree, then commit.
+
 ## Completion checklist
-- All open tickets have been handled (`tk list status=open` returns nothing)
+- All open tickets have been handled (`tk list --status=open` returns nothing)
 - All worker work has been merged back into your integration branch
 - All worktrees created by workers have been removed and pruned
 - All ticket statuses are up to date.
