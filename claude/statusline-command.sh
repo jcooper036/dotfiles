@@ -37,7 +37,29 @@ format_reset() {
   fi
 }
 
-dir_display=$(echo "$cwd" | sed "s|$HOME|~|")
+wt_session_name=$(echo "$input" | jq -r '.worktree.name // empty')
+wt_session_path=$(echo "$input" | jq -r '.worktree.path // empty')
+wt_linked_name=$(echo "$input" | jq -r '.workspace.git_worktree // empty')
+
+if [ -n "$wt_session_name" ]; then
+  if [ -n "$wt_session_path" ]; then
+    dir_display=$(echo "$wt_session_path" | sed "s|$HOME|~|")
+  else
+    dir_display=$(echo "$cwd" | sed "s|$HOME|~|")
+  fi
+  git_part="(wt) $wt_session_name"
+elif [ -n "$wt_linked_name" ]; then
+  dir_display=$(echo "$cwd" | sed "s|$HOME|~|")
+  git_part="(wt) $wt_linked_name"
+else
+  dir_display=$(echo "$cwd" | sed "s|$HOME|~|")
+  branch=$(git -C "$cwd" branch --show-current 2>/dev/null)
+  if [ -n "$branch" ]; then
+    git_part="(br) $branch"
+  else
+    git_part=""
+  fi
+fi
 
 if [ -n "$used_pct" ]; then
   used_int=$(printf "%.0f" "$used_pct")
@@ -70,8 +92,14 @@ if [ -n "$week_pct" ] && [ -n "$week_resets" ]; then
   fi
 fi
 
-if [ -n "$limits_part" ]; then
-  printf "%s  |  %s  |  %s  |  %s" "$model" "$dir_display" "$ctx_part" "$limits_part"
+if [ -n "$git_part" ]; then
+  dir_and_git="${dir_display}  ${git_part}"
 else
-  printf "%s  |  %s  |  %s" "$model" "$dir_display" "$ctx_part"
+  dir_and_git="$dir_display"
+fi
+
+if [ -n "$limits_part" ]; then
+  printf "%s  |  %s  |  %s  |  %s" "$model" "$dir_and_git" "$ctx_part" "$limits_part"
+else
+  printf "%s  |  %s  |  %s" "$model" "$dir_and_git" "$ctx_part"
 fi
