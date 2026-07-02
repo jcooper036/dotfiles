@@ -7,6 +7,9 @@ Reference for concepts learned. Use vim's native tools to look up specifics.
 - `:help {topic}` - Built-in docs (the source of truth)
 - `:map {key}` - See what a key does
 - `:verbose map {key}` - See where a mapping was defined
+- `:checkhealth lsp` - Diagnose why an LSP server isn't attached/running
+- `:LspInfo` - Clients attached to current buffer (root dir, filetype match)
+- `:lua vim.print(vim.lsp.get_clients())` - Raw list of all active LSP clients
 
 ---
 
@@ -198,6 +201,28 @@ Pipe a range or visual selection through any shell command.
 - `:'<,'>!column -t` - align into columns
 - **Key concept:** `!` turns vim into a pipeline — any Unix tool becomes a text transformation
 - **Search terms:** `:help :!`, `:help filter`
+
+### LSP References vs Project Text Search
+Two different tools for "where else does this appear":
+- `grr` - LSP references (Neovim 0.11+ built-in default, not an NvChad remap). Uses the language server, so it's accurate for renamed/reimported symbols.
+- `gri` - LSP go to implementation
+- `:Telescope grep_string` - ripgrep search defaulting to word under cursor (or visual selection if one is active). Plain text, not LSP-aware, but works across any file type.
+- **Key concept:** No need to yank/select first for a single word — both tools read the word under the cursor directly, same as `*`.
+- **Note:** `<leader>fw` in this config is `Telescope live_grep`, which opens an empty prompt (you type the pattern) — different from `grep_string`, which is not currently bound to a key.
+- **Search terms:** `:help lsp-defaults`, `:help gO`, `telescope.builtin` docs for `grep_string`
+
+### Mode-Scoped Keymaps (why `grr` broke in visual mode)
+Keymaps are bound to specific modes. `grr` (LSP references) is normal-mode only.
+- In visual mode, `r` is a different command entirely: "replace every selected char with the next key pressed."
+- So `v w g r r` = enter visual → select word+ → `g` dead-ends (no visual `gr` command) → `r` starts visual-replace → final `r` is consumed as the replacement char → selection becomes all `r`s.
+- **Key concept:** Lookup commands (`*`, `grr`, `gri`, `K`) are normal-mode and read the word under the cursor — no selection needed. Visual mode is for operating on (deleting/yanking/changing) a span, not for triggering lookups.
+- **Search terms:** `:help v_r`, `:help map-modes`
+
+### `vw` vs `viw`
+- `vw` from word start selects through to the start of the NEXT word — drags trailing whitespace/punctuation along.
+- `dw`/`cw` have a special-cased exception for this quirk; plain visual `v` + `w` does not.
+- `viw` (inner word text object) selects exactly the word, nothing more — use this instead of `vw` when you want just the word.
+- **Search terms:** `:help word-motions`, `:help iw`
 
 ---
 
