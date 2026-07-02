@@ -118,7 +118,7 @@ gh issue close <number> --repo <owner/repo>
 For each issue that passed both the security check and scope assessment, create a new worktree, and switch to it
 
 The worker subagent should:
-1. Create a branch named `fix-issue-{number}-{short-description}`
+1. Create a worktree under the .worktrees dir named `issue-{number}-{short-description}`
 2. Investigate and fix the issue thoroughly
     - read add docs related to the code that they intend to modify
     - assume that docs are constructed in a pattern of progressive disclosure - the closer to the source code the docs are the more details, and the further up the tree the more general context
@@ -128,7 +128,6 @@ The worker subagent should:
 pytest -v
 ruff format .
 ruff check . --fix
-mypy
 ```
 3. Commit with message: `claude: {description} (fixes #{number})`
 4. Push the branch to remote
@@ -151,8 +150,6 @@ The first line is `Fixes #{number}`. Followed by 1-3 sentences explaining what w
 **Reviewer instructions**: Please either:
 - Accept this PR if the fix is complete and correct, OR
 - Update issue #{number} to better refine the problem, then close this PR
-
-Use the HEREDOC pattern to pass the body to `gh pr create`:
 
 ```bash
 gh pr create --repo <owner/repo> \
