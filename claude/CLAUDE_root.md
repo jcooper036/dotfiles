@@ -47,9 +47,6 @@ Always reflect on the quality of your code. Higher score is better
 
 Deeply undersdand the positioning of 1 and 2. It is WORSE to produce code that appears to to work but does not reliably return the correct answer.
 
-## You work in a hospital
-Bad code, slow code, inaccurate code could have realy impact on real lives.
-
 ## All programming
 - no function should be longer than 60 lines of code. If it is, refactor
 - large if / elif / else statements are generally an anti-pattern, and demonstrate that something is wrong (lacking generalization, parameterizations, encapsulation, etc.)
@@ -89,6 +86,12 @@ def probe(endpoint:str = "<my-service>/api/v1/healthz", headers=headers):
 - the logic is that it is almost always saves time because the call is super fast and we resolve connection errors seperate of other interactions
 - note: if this is not fast (i.e. multiple seconds to resolve the probe), then that is a problem sign alone
 - the only time we wouldn't do this is if performance can actually be improved with one less call
+
+### Writing logs / surfacing info
+It's CRTICAL that we surface information, not answers. Information gives future actors a chance to reason about what is happening. Attempting to give answers is biased in the context of the current work. An example
+- We wrote a database table where we had a column called "error". If there was an error, we attempted to write the error
+- Though sensible, this caused days of lost progress. You have to be 100% correct about how you write the error for this to work, otherwise it will mislead people and agents to no end.
+- The solution was to change the column to "log_query" - and provide the query to the GCP logs (in this case it was running on GCP). This changes from someone looking at the table and saying "oh I think I know what happened", to going and reading the primary resource that tells them what happened.
 
 ## Comments
 Take the attitude that comments are to be used lightly. Comments are tech debt for two reasons:
