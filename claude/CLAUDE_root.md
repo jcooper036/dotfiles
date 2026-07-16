@@ -103,8 +103,6 @@ When you must use them:
 - Comments should only be used when code has already caused confusion
 - Comments should NEVER contain numbered steps, "Step X", or "Phase X" labels. If you reorder code, these go stale. More importantly, needing them is a sign the code isn't well-organized — fix the architecture instead of labeling sections.
 
-**Documentation** is still ok - comments are suspect because of their proximity to the code
-
 ## Git and github
 - ALWAYS use the `gh` tool to interact with github
 
@@ -165,11 +163,6 @@ When you must use them:
 - DO NOT write unit tests that simply replicate pydantic validation - though it is OK to write intergation tests that prove that interface assumptions hold over multiple steps
 - Conversely: if you find yourself writing tests that assert a data structure has certain keys or shapes, that is a signal the code should use pydantic or TypedDict instead. Define the schema in code; do not test-assert your way to structural guarantees. The correct response is to add the schema, not the tests.
 
-
-### Docstrings and typing
-- use numpy style docstrings: https://numpydoc.readthedocs.io/en/latest/format.html
-- In the summary, explain the INTENT of the function / class
-
 ## javascript / frontend interfaces
 How to decide between approaches, given no other instructions:
 - do parts of the app need to react to other parts? (yes, use interactive)
@@ -203,9 +196,6 @@ Instead:
 - if a project implies multiple services, setup or refactor to use docker compose
 - ALWAYS use `docker compose` to run services, NEVER `docker-compose`
 - If python services are required for, use `uv` to manage the python environment and installs in the DOCKERFILE. Have a step where you install uv to cache that layer, then a followup using `uv sync` to install the requirements
-
-## testing
-- write tests, but only write _good_ tests. Do not write filler tests. There is no expectation for test coverage, but there is an expectation that you use tests to speed up and harden development.
 
 ## documentation
 In general, documentation should capture intent, constraints, and non-obvious structure,
@@ -259,6 +249,7 @@ that requires synthesis, intent, or historical context rather than inspection.
 - If empirical data is required by a documentation standard but has not been measured yet, write `[incomplete]` as a placeholder. Do not fill the gap with estimates.
 
 ## Test Writing
+
 ### Good tests
 - test complicated logic
 - test behavior of assumed inputs and handling of out of bounds inputs
