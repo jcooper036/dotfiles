@@ -52,6 +52,9 @@ alias pull='git pull'
 alias checkout='git checkout'
 alias cug="git checkout trunk;git pull"
 
+# tmux statup
+alias start_tmux="$HOME/dotfiles/tmux_startup.sh"
+
 # pytest
 alias pyt='if command -v uv >/dev/null; then uv run pytest; else pytest; fi'
 function py() {
