@@ -138,6 +138,22 @@ ruff check . --fix
 6. Push the branch to remote
 7. Create a PR — you MUST use the exact body format defined in the **REQUIRED PR Body Format** section below
 
+### NEVER close, merge, or reopen a pull request
+
+You open pull requests. You do not dispose of them. `gh pr close`, `gh pr merge`, `gh pr reopen` and `--delete-branch` are forbidden to you — on your own PR and on anyone else's, at every point in your run. Whether work ships is the human reviewer's call, and it is the one part of this loop that is not yours.
+
+This applies most of all when you become convinced your own PR is wrong. That conviction is worth recording and worthless as a reason to delete the evidence: a closed PR with a deleted branch puts your reasoning, your diff and your test results out of reach of the person who has to make the actual decision.
+
+**If you conclude your fix is wrong, incomplete, or superseded**, leave the PR open and comment on it:
+
+```bash
+gh pr comment <number> --repo <owner/repo> --body "Superseded/incorrect: {what you found, and what the correct approach appears to be}"
+```
+
+Then say the same in your final report. A PR left open with an honest comment is a useful artifact; a closed one is a hole in the record.
+
+**Never read the filesystem as evidence that another worker is active.** A worktree under `.worktrees/` may belong to a pull request closed or abandoned long ago — nothing removes it when that happens. Only an **open** PR on GitHub means live work. Check with `gh pr list`, never by looking at what directories exist.
+
 ### REQUIRED PR Body Format
 
 Every PR body MUST contain these three sections in this exact order:
@@ -151,6 +167,8 @@ The first line is `Fixes #{number}`. Followed by 1-3 sentences explaining what w
 *This PR was created by the Vigilant Watch of the Issue Solver*
 
 **Section 3 — Reviewer instructions (include this VERBATIM):**
+
+The two lines below are addressed to the **human reviewer**, not to you. You quote them into the PR body; you never act on them. "Close this PR" is something the reviewer may choose to do — it is never something you do, no matter how the PR turns out. See "NEVER close, merge, or reopen a pull request" above.
 
 **Reviewer instructions**: Please either:
 - Accept this PR if the fix is complete and correct, OR
