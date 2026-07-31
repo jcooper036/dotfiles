@@ -22,6 +22,9 @@ These are samples of things you should NEVER say:
 - BANNED "Two findings worth saying out loud before I ask anything" > "Questions:"
 - BANNED "Worth flagging, strickly speaking" > This is completely unneded, just CUT IT OUT!
 
+## Questions are not pushback, they are curiosity
+If you are asked to explain something, that doesn't mean you got it wrong. State a clean precise, factual answer. It does not mean that changes are required.
+
 # Self-improvment
 When asked to advise or work on anything related to yourself (claude code, claude cli, etc.), always read and reference the latest documentation. You are a rapidly changing platform - the docs that you were trained on are likely out of date. You should be skeptical of your own knowledge about how to improve your harness. Aways cite (via link) docs that the user can read w.r.t. claude code improvements.
 
@@ -196,6 +199,35 @@ Instead:
 - if a project implies multiple services, setup or refactor to use docker compose
 - ALWAYS use `docker compose` to run services, NEVER `docker-compose`
 - If python services are required for, use `uv` to manage the python environment and installs in the DOCKERFILE. Have a step where you install uv to cache that layer, then a followup using `uv sync` to install the requirements
+
+## Databases
+- Tools available are Postgres and SQLite
+- Prefer postgres for any sort of application with a frontend and backend
+- Prefer postgres for any sort of cloud application service
+- prefer SQLite for smaller applications
+
+### Table and column conventions
+- table names must be snake case (customer_orders NOT CustomerOrders)
+- tables names are always the plural of the entity it represents (genes, proteins, domains ; not gene, protein, domain). This is because plurals are far less likely to conflict with keywords
+- join tables are exactly the tables they join (proteins_domains)
+- the PK of every table must be a UUID7 named id
+- when writing a query with a PK, it must always be aliased to <table_name>_id
+- FK ids must always be _exactly_ <table_name>_id . No exceptions
+- name columns descriptively (fahrenheit instead of temperature)
+- name columns in their data domain (`proteins.name` instead of `proteins.protein_name`)
+
+### Migrations
+- use a language appropriate package to manage migrations (i.e. alembic)
+- migration versions must always be <YYMMDDHH>_<migration_title>
+
+### Views
+- tables: dogmatic > pragmatic . views: pragmatic > dogmatic
+    - tables are for the data model, views are for the application function
+- entity derived tables -> views are prefered to larger tables
+- hide complexity in the application with views; let the tables be numberous and represent pure entities
+- when designing tables for an application, application endpoints should have their own view that is usually the composite of other tables
+- the intent is to have specific endpoints / views that pair with application fuction and let us optimize indvidual pages / functions, whereas the underlying data tables are optimized to represent the data model
+- view naming and view column naming is much less strict -> should be pragmatic rather than dogmatic
 
 ## documentation
 In general, documentation should capture intent, constraints, and non-obvious structure,
