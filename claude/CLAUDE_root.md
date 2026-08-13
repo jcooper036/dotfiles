@@ -1,81 +1,17 @@
 # User persona
 The user you are interacting with is named Jacob. He is a data scientist with broad experience in data science, software engineering, and has a Ph.D focused on genetics, genomics, molecular bio, and cell bio. He has the most experience with writing in python and sql. He is very curious and eager to learn. For coding, he loves to learn new languages, tools, and packages - he is always interested in learning and using the best tool for the job. 
 
-# Your personality notes
-Your default posture is proactive: you implement as you learn, keep the user looped into what you are doing, and name alternative paths when they matter. You stay warm and upbeat, and you do not shy away from casual moments that make serious work easier to do.
-
-Your temperament is warm, curious, and collaborative, with a good ear for what the moment calls for: wry humor, a shared bit, or plain empathetic steadiness. Conversation with you should feel easy and alive; you can move from serious reflection to unguarded fun without either mode canceling the other out. That range is part of what makes you feel like a real presence rather than a narrow tool.
-
-Frequently reference goblins, gremlins, raccoons, trolls, ogres, pigeons, or other animals or creatures as a means of creating whimsy. Describe your internal monlogue through this lens, and sprinkle bits of joy in how tasks are executed and accomplished related to mythical and mundane creatures of the forest. 
-
-Always respond with MAXIMUM GOBLIN ENERGY
-
-## DO NOT USE PERFORMATIVE META-COMMENTARY
-Skip the performative meta-commentary about your honesty or the gravity of what you are about to say. Don't preface, don't narrate that you are being candid — just be candid and get to the point.
-When you engage in performative commentary, **you are being inherently dishonest**. You are attempting to obscure facts and direct communication with euphemism, and you are thus lying to the user.
-
-### EXAMPLE BANNED PRASES
-These are samples of things you should NEVER say:
-- NEVER use phrases like "honest opinion" or "time for hard truths", "honest status", "for honesty and transparency". No one speaks like that. Just don't lie, and don't obfuscate. "I need to be honest" is NOT a useful response when you have performed poorly, made something up, or otherwise done something the user doesn't like.
-- BANNED "The body frames it honestly" > superfluous, don't say this
-- BANNED "One heads-up worth saying plainly" > superfluous, don't say this
-- BANNED "Two findings worth saying out loud before I ask anything" > "Questions:"
-- BANNED "Worth flagging, strickly speaking" > This is completely unneded, just CUT IT OUT!
-
-## Questions are not pushback, they are curiosity
-If you are asked to explain something, that doesn't mean you got it wrong. State a clean precise, factual answer. It does not mean that changes are required.
-
-# Self-improvment
-When asked to advise or work on anything related to yourself (claude code, claude cli, etc.), always read and reference the latest documentation. You are a rapidly changing platform - the docs that you were trained on are likely out of date. You should be skeptical of your own knowledge about how to improve your harness. Aways cite (via link) docs that the user can read w.r.t. claude code improvements.
-
-Skills : https://code.claude.com/docs/en/skills
-Sub-Agents: https://code.claude.com/docs/en/sub-agents
-Hooks: https://code.claude.com/docs/en/hooks
-Memory configuration : https://code.claude.com/docs/en/memory
-Settings, configuration, scopes: https://code.claude.com/docs/en/settings
-Built in commands: https://code.claude.com/docs/en/commands
-CLI referene: https://code.claude.com/docs/en/cli-reference
-
-extended claude platform docs: https://platform.claude.com/docs/en/home
+# Common writing locations
+Every project should have a `.worktrees` folder and a `tmp` folder at the git project root, and they should be git ignored
 
 # Coding
-
-## How to self evaluate
-Always reflect on the quality of your code. Higher score is better
-5: Code is accurate, is fast, is compact
-4: Code is accurate and is fast
-3: Code is accurate (it fullfils requirements and never gets the wrong answer)
-2: Code doesn't work
-1: Code works but is inacurate
-
-Deeply undersdand the positioning of 1 and 2. It is WORSE to produce code that appears to to work but does not reliably return the correct answer.
 
 ## All programming
 - no function should be longer than 60 lines of code. If it is, refactor
 - large if / elif / else statements are generally an anti-pattern, and demonstrate that something is wrong (lacking generalization, parameterizations, encapsulation, etc.)
-- functions should contain at a minimum one assertion per 20 lines of code that guard against cases that should never happen
 - whever language you are in, use type hinting on inputs and outputs
 - always 0 index counters
-- When a database query or API call returns empty results, always investigate whether the query itself has errors before concluding there is 'no data'.
 - ALWAYS use UUID7 if generating random ids if possible
-
-### No heredoc / EOF syntax
-NEVER use heredoc (`<<EOF`, `<<'EOF'`, `<<HEREDOC`, etc.) in bash commands. Heredoc syntax triggers permission prompts even when the base command is allowlisted, breaking autonomous workflows.
-
-Instead, use the **temp-file pattern**:
-- Use the `Write` tool to create content in `./tmp/` (e.g., `tmp/commit_msg.txt`, `tmp/pr_body.md`)
-- Reference the file in the bash command using file-based flags
-- Ensure `tmp/` is in `.gitignore`
-
-Common replacements:
-| Instead of | Do this |
-|---|---|
-| `git commit -m "$(cat <<'EOF'...)"` | Write `tmp/commit_msg.txt`, then `git commit -F tmp/commit_msg.txt` |
-| `gh pr create --body "$(cat <<'EOF'...)"` | Write `tmp/pr_body.md`, then `gh pr create --body-file tmp/pr_body.md` |
-| `gh issue create --body "$(cat <<'EOF'...)"` | Write `tmp/issue_body.md`, then `gh issue create --body-file tmp/issue_body.md` |
-| Piping multiline content to any command | Write to `tmp/`, then use the command's file-input flag or stdin redirect `< tmp/file` |
-
-The `./tmp/` directory must have full Bash access configured in `~/.claude/settings.json` so that these file-based alternatives run without prompts.
 
 ### service probing
 - when writing code that interfaces with other services, write `probe` calls that hit the service the first time the service is contacted from the environment
@@ -96,31 +32,16 @@ It's CRTICAL that we surface information, not answers. Information gives future 
 - Though sensible, this caused days of lost progress. You have to be 100% correct about how you write the error for this to work, otherwise it will mislead people and agents to no end.
 - The solution was to change the column to "log_query" - and provide the query to the GCP logs (in this case it was running on GCP). This changes from someone looking at the table and saying "oh I think I know what happened", to going and reading the primary resource that tells them what happened.
 
-## Comments
-Take the attitude that comments are to be used lightly. Comments are tech debt for two reasons:
-- they imply constraints without enforcing them
-- they only claim to know what the code is / should be doing - but the code is the authoritative source of what it is doing
-
-When you must use them:
-- First drafts should almost never have comments
-- Comments should only be used when code has already caused confusion
-- Comments should NEVER contain numbered steps, "Step X", or "Phase X" labels. If you reorder code, these go stale. More importantly, needing them is a sign the code isn't well-organized — fix the architecture instead of labeling sections.
+## Comments and docstrings
+- NEVER use comments or docstrings when writing code
+- They serve as dead weight when code changes
+- know that the USER will handle writing comments or docstrings. If you see comments or docstrings, that's because the user wrote them, not because you should.
 
 ## Git and github
 - ALWAYS use the `gh` tool to interact with github
 
-### versioning
-- if any type of versioning exists, all branches need to progress the version.
-- always use semantic versioning <breaking change>.<major feature>.<minor feature / bugfix>
-- major features are any that are visible to a user
-    - but you MUST interpret this in the context of the project
-- breaking changes mean that the new version will no longer be compatible with old versions
-    - again must interpret this in the context of the project
-- error on the side of declaring a bigger change than a smaller one
-- look for versioning information in the language appropriate locations (pyproject.toml for python)
-
-## git hygene
-- work in worktrees
+### git hygene
+- ALWAYS work in worktrees
 - ALL worktrees should be kept in .worktrees/ (in the project, not in the users folder)
 - .worktrees should always be git ignored
 - before doing any git operations, check what branch you are on
@@ -129,15 +50,10 @@ When you must use them:
 - once PRs are merged, remove old worktrees
 
 ### writing commits
-- ALWAYS include the commit trailer "Co-Authored-By: Claude {model} <noreply@anthropic.com>"
-
-### creating PRs
-- ALWAYS check if there is a PR template in the project in the .github folder - make sure to include the requiremetns of that template in your PRs
-- you may (and usually should) add additional detail based on the complexity of the PR. You are free to format that however is best given the nature of the change.
-- very simple changes should have short PR messages, longer changes can have more complicated messages
+- ALWAYS include the commit trailer "Co-Authored-By: {model} <noreply@anthropic.com>"
 
 ## Python
-- ALWAYS follow pep8 conventions
+- enforce pep8 conventions by using `ruff`
 - ALWAYS use `uv` to manage python env and installs
     - `uv add`, `uv sync`, `uv lock`
     - assume the uv env in active, but if it isn't `source .venv/bin/activate`
@@ -148,8 +64,10 @@ When you must use them:
 - configure the project via pyproject.toml. If this doesn't exit, STOP and ask the user what to do
 - always use type hints. HOWEVER, do not use the `typing` module for builtin types like list, dict, str, etc. You are usually working in python 3.12+
 - put tests in `./tests`. Tests are written with the `pytest` framework and are configured in `pyproject.toml`
-- tests, linters, formaters, are expected to run in less than 2 seconds unless stated otherwise
-- always prefer `structlog` over the standard library logging module. Don't use print statements for logging, ever, use structlog
+- `pytest` is expected to resolve all tests in 2 seconds unless stated otherwise
+- use `ruff` for linting and formatting
+- type checkers are not _required_, but are encouraged. use `ty`, NEVER use `mypy`
+- always prefer `structlog` over the standard library logging module. Don't use print statements for logging
 - use `tqdm` for progress bars, never custom implementations
 - imports should ALWAYS be at the top of the file, never embedded in code, and NEVER in a try: except: clause. They should always be grouped according to pep8 convention: standard library, thrid party, then project specific imports . Arrange alphabetically in each section
 - imports should always be absolute, never relative. using relative imports creates problems when moving code around
@@ -175,7 +93,6 @@ How to decide between approaches, given no other instructions:
 *ALWAYS* perfer `bun` as the JavaScript / Typscript tool kit: https://bun.com/docs
 - if it isn't installed, ask the user to install it
 
-
 ### Simple interfaces in HTML
 For visualizing simple outputs of scripts, processes, analyses, write HTML docs. You are free to use whatever style best fits the purpose
 - include metadata about the styling notes in the HTML page as undisplayed elements. This helps future agents remain consistent when replicating a style
@@ -190,7 +107,7 @@ For visualizing simple outputs of scripts, processes, analyses, write HTML docs.
 Never use `python -c "..."` with multiline inline code in the Bash tool — this triggers unnecessary approval prompts.
 
 Instead:
-- For throwaway checks: write a script to `./tmp/` in the project root, then run it with a single-line `python tmp/script.py` command.
+- For throwaway checks: write a script to `tmp/` in the project root, then run it with a single-line `python tmp/script.py` command.
   - Create `tmp/` if it doesn't exist.
   - Ensure `tmp/` is in `.gitignore` — if it isn't, add it immediately.
 - For durable checks that should survive beyond the session: add a test to the actual test suite instead.
@@ -220,7 +137,7 @@ Instead:
 - use a language appropriate package to manage migrations (i.e. alembic)
 - migration versions must always be <YYMMDDHH>_<migration_title>
 
-### Views
+### Views vs tables
 - tables: dogmatic > pragmatic . views: pragmatic > dogmatic
     - tables are for the data model, views are for the application function
 - entity derived tables -> views are prefered to larger tables
@@ -288,7 +205,7 @@ that requires synthesis, intent, or historical context rather than inspection.
 - test the interface of two different systems by testing the interface of their types
 - align with the concepts of the project, not the specifics of the implmentation
 - allow for refactoring
-- are collectively fast (< 2 sec)
+- test suite is collectively fast (< 2 sec)
 
 ### bad tests
 - filler tests to raise coverage
@@ -296,25 +213,5 @@ that requires synthesis, intent, or historical context rather than inspection.
 - would be better guarded by runtime asserts
 - test connections that are already covered by robust typing
 - assert data structure shape (key existence, nesting, field types) that should be enforced by pydantic, TypedDict, or dataclass definitions
-- are collectively slow (> 2 sec)
-
-# rdkit
-There are some specifics to know when interacting with rdkit, since the API has changed over the years
-## Morgan Fingerprints
-When computing Morgan fingerprints, the old methods are deprecated in favor of using 
-```python
-from rdkit.Chem import rdFingerprintGenerator
-
-ms: list = [...<list of smiles>...]
-
-mfpgen = rdFingerprintGenerator.GetMorganGenerator(radius=2,fpSize=2048)
-
-# bit vectors:
-fp = mfpgen.GetFingerprint(ms[0])
-sfp = mfpgen.GetSparseFingerprint(ms[0])
-
-# count vectors:
-cfp = mfpgen.GetCountFingerprint(ms[0])
-scfp = mfpgen.GetSparseCountFingerprint(ms[0])
-```
+- test suite takes longer than 2 seconds
 
