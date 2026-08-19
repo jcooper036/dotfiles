@@ -219,7 +219,7 @@ Fixes #{number}
 - Update issue #{number} to better refine the problem, then close this PR
 EOF
 )" \
-  --reviewer <reviewer-username>
+  --reviewer jcooper036
 ```
 
 ### PR Self-Check (REQUIRED before submitting)
