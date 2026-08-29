@@ -51,6 +51,9 @@ alias push='git push'
 alias pull='git pull'
 alias checkout='git checkout'
 alias cug="git checkout trunk;git pull"
+alias gwl="git worktree list"
+alias gwp="git worktree prune;git worktree list"
+alias gwa="git worktree add"
 
 # tmux statup
 alias start_tmux="$HOME/dotfiles/tmux_startup.sh"

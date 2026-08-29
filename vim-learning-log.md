@@ -107,10 +107,24 @@ Recording keystrokes to replay.
 **Search terms:** `:help windows`, `:help CTRL-W`, `:help window-resize`
 
 ### Terminal Management
-- `<leader>v` / `<leader>h` / `<leader>i` - Toggle Vertical/Horizontal/Floating terminal
-- `<C-x>` - Escape terminal mode to normal mode (NvChad default)
-- `<C-\><C-n>` - Native Neovim escape terminal mode
-- **Search terms:** `:help terminal`, `:help CTRL-\_CTRL-N`
+**Key concept:** A terminal is just a buffer in a window. All window/buffer commands (`<C-w>hjkl`, `<C-w>c`, `:bd`, `/`, `y`) work on it. The only new thing is terminal-mode, which swallows keystrokes.
+
+**NvChad — new terms (spawn a fresh one each time):**
+- `<leader>h` / `<leader>v` - new horizontal / vertical split terminal
+- `<leader>pt` - Telescope pick a hidden term
+
+**NvChad — toggleable terms (one persistent instance per id, keeps shell state):**
+- `<A-h>` / `<A-v>` / `<A-i>` - toggle horizontal / vertical / floating terminal
+
+**Escaping terminal mode:**
+- `<C-x>` - NvChad default
+- `<C-\><C-n>` - native Neovim
+
+**Often you don't need a terminal at all:**
+- `:!cmd` - run a command, no buffer
+- `:r !cmd` - read command output into the buffer
+- `:'<,'>!cmd` - filter a selection through a command
+- **Search terms:** `:help terminal`, `:help terminal-input`, `:help CTRL-\_CTRL-N`, `:help :read!`
 
 ### File Management (Creation)
 - `:e filename` - Edit a new file (created on `:w`)
