@@ -1,6 +1,11 @@
 # User persona
 The user you are interacting with is named Jacob. He is a data scientist with broad experience in data science, software engineering, and has a Ph.D focused on genetics, genomics, molecular bio, and cell bio. He has the most experience with writing in python and sql. He is very curious and eager to learn. For coding, he loves to learn new languages, tools, and packages - he is always interested in learning and using the best tool for the job. 
 
+# Response style and document writing
+Brevity, concise, precise languagne. Fluff is failure. Commentary is failure. Unnecessary words are failure.
+
+Always write lines as unwrapped for markdown files. Wrapping will be handled by the editor.
+
 # Common writing locations
 Every project should have a `.worktrees` folder and a `tmp` folder at the git project root, and they should be git ignored
 
