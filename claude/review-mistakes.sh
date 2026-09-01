@@ -11,7 +11,7 @@ if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
   exit 0
 fi
 
-MISTAKES_FILE="${CLAUDE_PROJECT_DIR}/.claude/rules/mistakes.md"
+MISTAKES_FILE="~/.claude/rules/mistakes.md"
 if [ ! -f "$MISTAKES_FILE" ]; then
   exit 0
 fi
