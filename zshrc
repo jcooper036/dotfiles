@@ -78,6 +78,18 @@ function load_secrets() {
 # call the loader
 load_secrets
 
+# port process commands
+function pports() {
+  { printf 'PORT\tPID\tUSER\tCOMMAND\n'
+    lsof -nP -iTCP -sTCP:LISTEN +c0 |
+      awk 'NR>1 {n=split($9,a,":"); if (!s[a[n]" "$2]++) print a[n], $2, $3}' |
+      sort -n |
+      while read -r port pid user; do
+        printf '%s\t%s\t%s\t%s\n' "$port" "$pid" "$user" "$(ps -o command= -p "$pid")"
+      done
+  } | column -t -s $'\t' | cut -c1-"${COLUMNS:-160}"
+}
+
 # activate venv autmomatically on switching directories
 function auto_venv_switch() {
     # 1. Check if .venv directory exists in the current folder
