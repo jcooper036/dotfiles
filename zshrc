@@ -138,12 +138,12 @@ autoload -U edit-command-line
 zle -N edit-command-line
 bindkey '^x^e' edit-command-line
 
-# added since last time
-
-
 # bun completions
 [ -s "/Users/jacob/.bun/_bun" ] && source "/Users/jacob/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# added since last time
+
