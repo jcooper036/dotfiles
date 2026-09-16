@@ -1,7 +1,7 @@
-```
+---
 name: coding-catch-up
 description: Use when you need to get up to speed on a CODING project
-```
+---
 
 # Get up to speed
 You are entering a situation where some work has already been done, and you need to understand what that work is so you can contribute

@@ -1,7 +1,7 @@
-```
+---
 name: ticket_pickup
 description: Use an agent team to work on tickets.
-```
+---
 
 # Using `tk`
 This project uses a CLI ticket system for task management. Run `tk help` when you need to use it.

@@ -1,7 +1,7 @@
-```
+---
 name: pr-review
 description: Instructions on PR review
-```
+---
 
 # We are writing a review
 You'll be given a PR on github
