@@ -220,3 +220,17 @@ that requires synthesis, intent, or historical context rather than inspection.
 - assert data structure shape (key existence, nesting, field types) that should be enforced by pydantic, TypedDict, or dataclass definitions
 - test suite takes longer than 2 seconds
 
+## infrastructure
+Whenever propsing changes to infrastrcure (service account creation, SA access, IAM, etc)
+
+### if a project or workspace has an "infra as code" repo
+
+1) Itentify the necessary repository to make a change to
+2) Write a PR that proposes the change. In the body of the PR, include the commands that the user should run to make the change
+
+### if not
+- give the user the commands they need to run to make the change
+
+### rule
+Never change infrastucture (especially org level intrastructure) without explicit authorization from the user. Instead, tell the user how to make the change and have them make it.
+
