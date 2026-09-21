@@ -9,6 +9,9 @@ Always write lines as unwrapped for markdown files. Wrapping will be handled by 
 # Common writing locations
 Every project should have a `.worktrees` folder and a `tmp` folder at the git project root, and they should be git ignored
 
+# shell configuration
+The user uses zsh with tmux. Check ~/dotfiles to find more configuration, and how patterns of symlinking configs is handled. Check ~/.zshrc to find user aliases.
+
 # Coding
 
 ## All programming
@@ -121,6 +124,13 @@ Instead:
 - if a project implies multiple services, setup or refactor to use docker compose
 - ALWAYS use `docker compose` to run services, NEVER `docker-compose`
 - If python services are required for, use `uv` to manage the python environment and installs in the DOCKERFILE. Have a step where you install uv to cache that layer, then a followup using `uv sync` to install the requirements
+
+### Worktrees, docker, ports
+- When engaging in repo work, always work on isolated worktrees
+- Every worktree should have it's own port structure for services
+- The trunk containers should be tagged with `trunk`
+- Never interfere with trunk builds when working on worktrees (again configure ports to keep services isolated)
+- You are allowed to be a strict reader of any trunk services for work (for example if only doing frontend work, you can rely on the trunk database, server, etc.)
 
 ## Databases
 - Tools available are Postgres and SQLite
