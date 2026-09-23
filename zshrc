@@ -56,6 +56,7 @@ alias gwp="git worktree prune;git worktree list"
 alias gwa="git worktree add"
 
 # tmux statup
+export TMUX_TMPDIR=~/.tmux-sock
 alias start_tmux="$HOME/dotfiles/tmux_startup.sh"
 
 # pytest
