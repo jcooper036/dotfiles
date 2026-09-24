@@ -76,6 +76,8 @@ touch ~/.zshrc.local
 ```
 This config will always load first, and at the end it attempts to load ~/.zshrc.local
 
+Aliases live in `zshrc`, including aliases for scripts shipped inside Claude skills (see [claude/README.md](claude/README.md)).
+
 
 # starship_config
 The goal is just to have a portable config that I can use for any machine. This is for zsh
@@ -122,3 +124,5 @@ nvim
 # Then run :Lazy sync and :MasonInstallAll
 ```
 
+# claude
+Claude Code config, skills and agent instructions. Setup and symlinks: [claude/README.md](claude/README.md).

@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
+
+TAB=$(printf '\t')
+GRACE_SECONDS=3
+
+listeners() {
+  lsof -nP -iTCP -sTCP:LISTEN -Fpn 2>/dev/null | awk '
+    /^p/ { pid = substr($0, 2) }
+    /^n/ { n = split(substr($0, 2), a, ":"); key = pid SUBSEP a[n]; if (!(key in seen)) { seen[key] = 1; ports[pid] = ports[pid] (ports[pid] ? "," : "") a[n] } }
+    END { for (p in ports) print p "\t" ports[p] }' | sort -n
+}
+
+ancestors() {
+  local pid=$$
+  while [ -n "$pid" ] && [ "$pid" -gt 1 ]; do
+    printf '%s\n' "$pid"
+    pid=$(ps -o ppid= -p "$pid" | tr -d ' ')
+  done
+}
+
+process_dir() {
+  local pid="$1" args="$2" dir
+  dir=$(printf '%s\n' "$args" | tr ' ' '\n' | grep -m1 '/\.worktrees/')
+  [ -n "$dir" ] && { printf '%s' "$dir"; return; }
+  lsof -a -p "$pid" -d cwd -Fn 2>/dev/null | sed -n 's/^n//p' | head -1
+}
+
+classify() {
+  local pid="$1" dir="$2" branch
+  BRANCH="-"
+  if printf '%s\n' "$ANCESTORS" | grep -qxF "$pid"; then
+    CAT=keep; WHY="ancestor of this script"; return
+  fi
+  if ! branch=$(path_branch "$dir"); then
+    CAT=other; WHY="not running from a git checkout"; return
+  fi
+  BRANCH="$branch"
+  CAT=$(branch_verdict "$branch")
+  WHY="running from $(tilde "$dir")"
+}
+
+act() {
+  local pid="$1"
+  [ "$CAT" = branch ] || { printf 'none'; return; }
+  [ "$EXECUTE" -eq 1 ] || { printf 'stop'; return; }
+  kill -TERM "$pid" 2>/dev/null || { printf 'FAILED: kill -TERM'; return; }
+  printf '%s\n' "$pid" >>"$SIGNALED"
+  printf 'sent SIGTERM'
+}
+
+audit() {
+  local pid ports args dir
+  listeners | while IFS="$TAB" read -r pid ports; do
+    args=$(ps -o command= -p "$pid")
+    [ -n "$args" ] || continue
+    dir=$(process_dir "$pid" "$args")
+    classify "$pid" "$dir"
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "$ports" "$pid" "$(printf '%s' "$args" | cut -c1-50)" "$BRANCH" "$CAT" "$WHY" "$(act "$pid")"
+  done
+}
+
+report_survivors() {
+  local pid
+  [ -s "$SIGNALED" ] || return
+  sleep "$GRACE_SECONDS"
+  while read -r pid; do
+    kill -0 "$pid" 2>/dev/null && printf 'still running %ss after SIGTERM: pid %s (%s)\n' "$GRACE_SECONDS" "$pid" "$(ps -o command= -p "$pid" | cut -c1-80)"
+  done <"$SIGNALED"
+}
+
+main() {
+  local table
+  parse_args "$@"
+  ANCESTORS=$(ancestors)
+  SIGNALED=$(mktemp); table=$(mktemp)
+  { printf 'PORTS\tPID\tCOMMAND\tBRANCH\tCATEGORY\tREASON\tACTION\n'; audit; } >"$table"
+  print_table "$table"
+  print_summary "$table" 5
+  report_survivors
+  rm -f "$SIGNALED" "$table"
+}
+
+main "$@"

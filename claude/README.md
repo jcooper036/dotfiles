@@ -8,6 +8,14 @@ ln -s ~/dotfiles/claude/CLAUDE_root.md ~/.claude/CLAUDE.md
 ln -s ~/dotfiles/claude/statusline-command.sh ~/.claude/statusline-command.sh
 ```
 
+### Skills
+Each folder in `skills/` is one skill, symlinked individually into `~/.claude/skills/`. `~/.agents/skills` is itself a symlink to `~/.claude/skills`, so every skill is shared with non-Claude agents.
+```bash
+ln -s ~/.claude/skills ~/.agents/skills
+ln -s ~/dotfiles/claude/skills/<skill> ~/.claude/skills/<skill>
+```
+Skills with user-facing scripts (e.g. `cleanup`) get zsh aliases in `zshrc` pointing into `skills/<skill>/scripts/`.
+
 ### CLAUDE_root.md
 - is meant to be symlinked to `~/CLAUDE.md`
 This should contain general practices to emulate across ALL machines and ALL projects.

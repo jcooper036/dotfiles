@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
+
+TAB=$(printf '\t')
+PROJECT_LABEL=com.docker.compose.project
+WORKDIR_LABEL=com.docker.compose.project.working_dir
+
+probe_docker() {
+  docker info >/dev/null 2>&1 || { printf 'error: docker daemon not reachable (docker info failed)\n' >&2; exit 1; }
+}
+
+project_workdir() {
+  awk -F '\t' -v p="$1" '$1 == p && $2 != "" { print $2; exit }' "$PROJECT_DIRS"
+}
+
+project_branch() {
+  local project="$1" path
+  path=$(awk -F '\t' -v p="$project" '{ n = split($2, a, "/") } a[n] == p { print $2; exit }' "$WORKTREES")
+  [ -n "$path" ] || return 1
+  path_branch "$path"
+}
+
+classify() {
+  local project="$1" workdir="$2" tag="$3" branch
+  BRANCH="-"
+  case "$tag" in
+    *:trunk|*:trunk,*) CAT=keep; WHY="image tagged trunk"; return ;;
+  esac
+  [ -z "$workdir" ] && [ -n "$project" ] && workdir=$(project_workdir "$project")
+  if [ -n "$workdir" ]; then
+    branch=$(path_branch "$workdir") || { CAT=unclassified; WHY="compose working_dir is not a git checkout: $workdir"; return; }
+    WHY="compose working_dir $(tilde "$workdir")"
+  elif [ -n "$project" ]; then
+    branch=$(project_branch "$project") || { CAT=unclassified; WHY="compose project $project matches no repo or worktree"; return; }
+    WHY="compose project name matches a worktree"
+  else
+    CAT=unclassified; WHY="no compose labels"; return
+  fi
+  BRANCH="$branch"
+  CAT=$(branch_verdict "$branch")
+}
+
+act() {
+  local kind="$1" id="$2" err
+  [ "$CAT" = branch ] || { printf 'none'; return; }
+  [ "$EXECUTE" -eq 1 ] || { printf 'remove'; return; }
+  case "$kind" in
+    container) err=$( { docker stop "$id" && docker rm "$id"; } 2>&1 >/dev/null) ;;
+    network) err=$(docker network rm "$id" 2>&1 >/dev/null) ;;
+    image) err=$(docker rmi "$id" 2>&1 >/dev/null) ;;
+  esac
+  [ $? -eq 0 ] && { printf 'removed'; return; }
+  printf 'FAILED: %s' "$err" | tr '\n\t' '  '
+}
+
+row() {
+  local kind="$1" id="$2" name="$3" project="$4"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$kind" "$name" "${project:--}" "$BRANCH" "$CAT" "$WHY"
+}
+
+audit_containers() {
+  local id name image state project workdir
+  docker ps -a --format "{{.ID}}$TAB{{.Names}}$TAB{{.Image}}$TAB{{.State}}$TAB{{.Label \"$PROJECT_LABEL\"}}$TAB{{.Label \"$WORKDIR_LABEL\"}}" |
+    while IFS="$TAB" read -r id name image state project workdir; do
+      classify "$project" "$workdir" "$image"
+      printf '%s\t%s\n' "$(row container "$id" "$name ($state)" "$project")" "$(act container "$id")"
+    done
+}
+
+audit_networks() {
+  local id name project
+  docker network ls --filter "label=$PROJECT_LABEL" --format "{{.ID}}$TAB{{.Name}}$TAB{{.Label \"$PROJECT_LABEL\"}}" |
+    while IFS="$TAB" read -r id name project; do
+      classify "$project" "" ""
+      printf '%s\t%s\n' "$(row network "$id" "$name" "$project")" "$(act network "$id")"
+    done
+}
+
+audit_images() {
+  local id tag project
+  docker images -q --filter "label=$PROJECT_LABEL" | sort -u |
+    xargs docker image inspect --format "{{.ID}}$TAB{{join .RepoTags \",\"}}$TAB{{index .Config.Labels \"$PROJECT_LABEL\"}}" |
+    while IFS="$TAB" read -r id tag project; do
+      classify "$project" "" "$tag"
+      printf '%s\t%s\n' "$(row image "$id" "$tag" "$project")" "$(act image "$id")"
+    done
+}
+
+main() {
+  local table
+  parse_args "$@"
+  probe_docker
+  WORKTREES=$(mktemp); PROJECT_DIRS=$(mktemp); table=$(mktemp)
+  list_worktrees >"$WORKTREES"
+  docker ps -a --format "{{.Label \"$PROJECT_LABEL\"}}$TAB{{.Label \"$WORKDIR_LABEL\"}}" | sort -u >"$PROJECT_DIRS"
+  {
+    printf 'KIND\tNAME\tPROJECT\tBRANCH\tCATEGORY\tREASON\tACTION\n'
+    audit_containers
+    audit_networks
+    audit_images
+  } >"$table"
+  print_table "$table"
+  print_summary "$table" 5
+  rm -f "$WORKTREES" "$PROJECT_DIRS" "$table"
+}
+
+main "$@"

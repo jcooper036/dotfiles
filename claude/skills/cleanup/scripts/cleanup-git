@@ -1,0 +1,234 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+. "$(dirname "$(readlink -f "$0")")/lib.sh"
+
+STALE_DAYS=14
+ABANDON_DAYS=3
+NEW_BRANCH_DAYS=1
+TAB=$(printf '\t')
+
+probe_gh() {
+  GH_OK=1
+  gh auth status >/dev/null 2>&1 || { GH_OK=0; printf 'warn: gh auth status failed; PR lookups skipped\n' >&2; }
+}
+
+repo_base() {
+  local repo="$1" b
+  b=$(git -C "$repo" symbolic-ref -q --short refs/remotes/origin/HEAD)
+  if [ -n "$b" ]; then printf '%s' "$b"; return; fi
+  for b in $PROTECTED_BRANCHES; do
+    git -C "$repo" show-ref -q --verify "refs/heads/$b" && { printf '%s' "$b"; return; }
+  done
+}
+
+fetch_prs() {
+  local repo="$1" out="$2"
+  PR_OK=0
+  [ "$HAS_REMOTE" -eq 1 ] && [ "$GH_OK" -eq 1 ] || return
+  (cd "$repo" && gh pr list --state all --limit 5000 \
+    --json headRefName,state,headRefOid,number,updatedAt \
+    --jq '.[] | [.headRefName, .state, .headRefOid, (.number|tostring), .updatedAt] | @tsv') >"$out" 2>/dev/null &&
+    PR_OK=1
+}
+
+pr_for_branch() {
+  awk -F '\t' -v b="$1" '$1 == b { if ($2 == "OPEN") { print; found = 1; exit } if (!first) first = $0 }
+    END { if (!found && first) print first }' "$2"
+}
+
+newest_mtime() {
+  local newest=0 f m
+  while IFS= read -r f; do
+    [ -e "$f" ] || continue
+    m=$(stat -f %m "$f")
+    [ "$m" -gt "$newest" ] && newest=$m
+  done
+  printf '%s' "$newest"
+}
+
+gather_dirty() {
+  local wt="$1" files
+  DIRTY=0; DIRTY_EPOCH=0
+  [ -n "$wt" ] && [ -d "$wt" ] || return
+  files=$(git -C "$wt" status --porcelain --untracked-files=all | cut -c4- | sed 's/.* -> //')
+  [ -n "$files" ] || return
+  DIRTY=1
+  DIRTY_EPOCH=$(printf '%s\n' "$files" | (cd "$wt" && newest_mtime))
+  [ "$DIRTY_EPOCH" -gt 0 ] || DIRTY_EPOCH=$(stat -f %m "$(git -C "$wt" rev-parse --path-format=absolute --git-path index)")
+}
+
+gather_unpushed() {
+  local repo="$1" sha="$2"
+  UNPUSHED=0
+  [ "$HAS_REMOTE" -eq 1 ] || return
+  [ -n "$PR_OID" ] && [ "$PR_OID" = "$sha" ] && return
+  [ -n "$PR_OID" ] && git -C "$repo" merge-base --is-ancestor "$sha" "$PR_OID" 2>/dev/null && return
+  UNPUSHED=$(git -C "$repo" rev-list --count "$sha" --not --remotes)
+}
+
+gather_branch() {
+  local repo="$1" base="$2" branch="$3" sha="$4" wt="$5" prs="$6" pr log
+  pr=$(pr_for_branch "$branch" "$prs")
+  PR_STATE=$(printf '%s' "$pr" | cut -f2); PR_OID=$(printf '%s' "$pr" | cut -f3); PR_NUM=$(printf '%s' "$pr" | cut -f4)
+  gather_dirty "$wt"
+  gather_unpushed "$repo" "$sha"
+  AHEAD=1
+  [ -n "$base" ] && AHEAD=$(git -C "$repo" rev-list --count "$base..$sha")
+  log="$(git -C "$repo" rev-parse --path-format=absolute --git-common-dir)/logs/refs/heads/$branch"
+  REF_EPOCH=0; WT_EPOCH=0
+  [ -f "$log" ] && REF_EPOCH=$(stat -f %m "$log")
+  [ -n "$wt" ] && [ -d "$wt" ] && WT_EPOCH=$(stat -f %m "$wt")
+}
+
+max() {
+  local m="$1" v
+  for v in "$@"; do [ "$v" -gt "$m" ] && m=$v; done
+  printf '%s' "$m"
+}
+
+decide_local_only() {
+  local cdate="$1" base="$2" activity
+  activity=$(max "$cdate" "$DIRTY_EPOCH")
+  if [ "$DIRTY" -eq 1 ] && [ "$(age_days "$DIRTY_EPOCH")" -lt "$ABANDON_DAYS" ]; then
+    CAT=in_progress; WHY="local-only repo, uncommitted changes $(age_days "$DIRTY_EPOCH")d ago"
+  elif [ "$DIRTY" -eq 0 ] && [ "$AHEAD" -eq 0 ] && [ "$(age_days "$(max "$REF_EPOCH" "$WT_EPOCH")")" -lt "$NEW_BRANCH_DAYS" ]; then
+    CAT=in_progress; WHY="local-only repo, no commits beyond $base yet, created today"
+  elif [ "$DIRTY" -eq 0 ] && [ "$AHEAD" -eq 0 ]; then
+    CAT=completed; WHY="local-only repo, no commits beyond $base"
+  elif [ "$(age_days "$activity")" -ge "$STALE_DAYS" ]; then
+    CAT=unclassified; WHY="local-only repo, unmerged work idle $(age_days "$activity")d"
+  else
+    CAT=in_progress; WHY="local-only repo, active $(age_days "$activity")d ago"
+  fi
+}
+
+decide_local_work() {
+  local cdate="$1" edit=0 what=""
+  [ "$UNPUSHED" -gt 0 ] && { edit=$cdate; what="$UNPUSHED unpushed commits"; }
+  [ "$DIRTY" -eq 1 ] && { edit=$(max "$edit" "$DIRTY_EPOCH"); what="${what:+$what + }uncommitted changes"; }
+  if [ "$(age_days "$edit")" -ge "$ABANDON_DAYS" ]; then
+    CAT=abandoned; WHY="$what, last edit $(age_days "$edit")d ago"
+  elif [ -n "$PR_STATE" ]; then
+    CAT=unclassified; WHY="$what $(age_days "$edit")d ago after PR #$PR_NUM $PR_STATE"
+  else
+    CAT=in_progress; WHY="$what, last edit $(age_days "$edit")d ago"
+  fi
+}
+
+decide_remote() {
+  local cdate="$1" base="$2" activity
+  activity=$(max "$cdate" "$DIRTY_EPOCH")
+  if [ "$PR_STATE" = OPEN ]; then
+    if [ "$(age_days "$activity")" -ge "$STALE_DAYS" ]; then
+      CAT=unclassified; WHY="open PR #$PR_NUM, idle $(age_days "$activity")d"
+    else
+      CAT=in_progress; WHY="open PR #$PR_NUM"
+    fi
+  elif [ "$DIRTY" -eq 1 ] || [ "$UNPUSHED" -gt 0 ]; then
+    decide_local_work "$cdate"
+  elif [ -n "$PR_STATE" ]; then
+    CAT=completed; WHY="PR #$PR_NUM $PR_STATE"
+  elif [ "$AHEAD" -eq 0 ]; then
+    activity=$(max "$REF_EPOCH" "$WT_EPOCH")
+    if [ "$(age_days "$activity")" -ge "$NEW_BRANCH_DAYS" ]; then
+      CAT=stale; WHY="no commits beyond $base, untouched $(age_days "$activity")d"
+    else
+      CAT=in_progress; WHY="no commits beyond $base yet, created $(age_days "$activity")d ago"
+    fi
+  elif [ "$(age_days "$cdate")" -ge "$STALE_DAYS" ]; then
+    CAT=stale; WHY="last commit $(age_days "$cdate")d ago, no PR"
+  else
+    CAT=in_progress; WHY="last commit $(age_days "$cdate")d ago, no PR"
+  fi
+}
+
+apply_guards() {
+  local repo="$1" wt="$2"
+  case "$CAT" in completed|stale|abandoned) ;; *) return ;; esac
+  if [ "$wt" = "$repo" ]; then
+    WHY="$CAT but checked out in primary worktree: $WHY"; CAT=unclassified
+  elif [ -n "$wt" ] && case "$PWD/" in "$wt"/*) true ;; *) false ;; esac; then
+    WHY="$CAT but is the current directory: $WHY"; CAT=unclassified
+  elif [ "$HAS_REMOTE" -eq 1 ] && [ "$PR_OK" -eq 0 ]; then
+    WHY="$CAT but PR lookup failed: $WHY"; CAT=unclassified
+  fi
+}
+
+act() {
+  local repo="$1" branch="$2" wt="$3" force="" err
+  case "$CAT" in completed|stale|abandoned) ;; *) printf 'none'; return ;; esac
+  [ "$EXECUTE" -eq 1 ] || { printf 'delete'; return; }
+  [ "$CAT" = abandoned ] && force="--force"
+  if [ -n "$wt" ]; then
+    err=$(git -C "$repo" worktree remove $force "$wt" 2>&1) || { printf 'FAILED worktree remove: %s' "$err" | tr '\n\t' '  '; return; }
+  fi
+  err=$(git -C "$repo" branch -D "$branch" 2>&1) || { printf 'FAILED branch -D: %s' "$err" | tr '\n\t' '  '; return; }
+  printf 'deleted'
+}
+
+row() {
+  local repo="$1" branch="$2" wt="$3" action="$4" shown_wt="-"
+  [ -n "$wt" ] && shown_wt="${wt#"$repo"/}"
+  [ "$wt" = "$repo" ] && shown_wt="(primary)"
+  printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$(tilde "$repo")" "$branch" "$shown_wt" "$CAT" "$WHY" "$action"
+}
+
+audit_branches() {
+  local repo="$1" base="$2" prs="$3" branch sha cdate wt
+  git -C "$repo" for-each-ref --format="%(refname:short)$TAB%(objectname)$TAB%(committerdate:unix)$TAB%(worktreepath)" refs/heads |
+    while IFS="$TAB" read -r branch sha cdate wt; do
+      if is_protected "$branch" || [ "$branch" = "${base#origin/}" ]; then continue; fi
+      gather_branch "$repo" "$base" "$branch" "$sha" "$wt" "$prs"
+      if [ "$HAS_REMOTE" -eq 1 ]; then decide_remote "$cdate" "$base"; else decide_local_only "$cdate" "$base"; fi
+      apply_guards "$repo" "$wt"
+      row "$repo" "$branch" "$wt" "$(act "$repo" "$branch" "$wt")"
+    done
+}
+
+audit_strays() {
+  local repo="$1" registered d path branch
+  registered=$(git -C "$repo" worktree list --porcelain | sed -n 's/^worktree //p')
+  for d in "$repo"/.worktrees/*/; do
+    [ -d "$d" ] || continue
+    d="${d%/}"
+    printf '%s\n' "$registered" | grep -qxF "$d" && continue
+    CAT=unclassified; WHY="directory in .worktrees is not a registered worktree"
+    row "$repo" "-" "$d" none
+  done
+  git -C "$repo" worktree list --porcelain | awk '/^worktree /{p=substr($0,10)} /^detached/{print p}' |
+    while read -r path; do
+      CAT=unclassified; WHY="detached HEAD worktree"
+      row "$repo" "(detached)" "$path" none
+    done
+}
+
+audit_repo() {
+  local repo="$1" base prs
+  prs=$(mktemp)
+  HAS_REMOTE=0
+  [ -n "$(git -C "$repo" remote)" ] && HAS_REMOTE=1
+  base=$(repo_base "$repo")
+  fetch_prs "$repo" "$prs"
+  if [ "$HAS_REMOTE" -eq 1 ] && [ "$PR_OK" -eq 0 ]; then
+    printf 'warn: PR lookup failed for %s\n' "$repo" >&2
+  fi
+  audit_branches "$repo" "$base" "$prs"
+  audit_strays "$repo"
+  [ "$EXECUTE" -eq 1 ] && git -C "$repo" worktree prune
+  rm -f "$prs"
+}
+
+main() {
+  local rows table repo
+  parse_args "$@"
+  probe_gh
+  rows=$(mktemp); table=$(mktemp)
+  find_repos | while read -r repo; do audit_repo "$repo"; done >"$rows"
+  { printf 'REPO\tBRANCH\tWORKTREE\tCATEGORY\tREASON\tACTION\n'; sort -t "$TAB" -k4,4 -k1,1 -k2,2 "$rows"; } >"$table"
+  print_table "$table"
+  print_summary "$table" 4
+  rm -f "$rows" "$table"
+}
+
+main "$@"
