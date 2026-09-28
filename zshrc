@@ -69,17 +69,14 @@ function py() {
 }
 
 # secrets
+function load_secrets() {
+  local file
+  for file in $HOME/.secrets/*.env(N.); do
+    source "$file"
+  done
+}
 alias secret_load='load_secrets'
 alias secret_add='vim $HOME/.secrets/misc.env'
-# load secrets if the file exists
-function load_secrets() {
-  if [[ -d "$HOME/.secrets" ]]; then
-    for file in "$HOME/.secrets"/*(N.); do
-      source "$file"
-    done
-  fi
-}
-# call the loader
 load_secrets
 
 # port process commands
