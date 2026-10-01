@@ -57,8 +57,27 @@ It's CRTICAL that we surface information, not answers. Information gives future 
 - instead, if you find yourself on one of those branches, make a new worktree for the current changes first
 - once PRs are merged, remove old worktrees
 
+### commits, pushes, PRs
+- commit and push as you go. do not end a step with uncommitted work
+- open a draft PR at the start of work, so progress is observable as commits on it and other agents can see what the branch changes
+- when a unit of work is done and verified, commit, push, and open or update the PR without asking
+- keep pushing follow-up work to the same PR until the user says it is done
+- before the first commit, confirm secrets (.env, tokens, user / channel ids) are git ignored
+
 ### writing commits
 - ALWAYS include the commit trailer "Co-Authored-By: {model} <noreply@anthropic.com>"
+
+## Sub-agents
+- use sub-agents when sequential work is not required: one sub-agent per independent item (feature, dataset, problem)
+- when delegating, your primary task is to farm out work and collect it. do not start doing a delegated item yourself
+- your goal is the whole task: delegate every item, not only the first one or two, and coordinate between sub-agents as needed
+- when the right method is uncertain, run several sub-agents with different strategies, each required to show its method works
+- when proposing independent next steps, propose a sub-agent for each
+- start your own branch (worktree). each sub-agent works on its own worktree branched from yours, and points its work back to your branch
+- you merge sub-agent work into your worktree. then open the PR from your branch
+- each sub-agent keeps its own caches and scratch data in its own worktree
+- tell sub-agents not to poll continuously. poll them at long intervals
+- remove sub-agent worktrees once their work is merged into yours
 
 ## Python
 - enforce pep8 conventions by using `ruff`
