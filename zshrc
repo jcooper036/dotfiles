@@ -1,3 +1,8 @@
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=100000
+SAVEHIST=100000
+setopt HIST_IGNORE_SPACE
+
 # path
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
@@ -5,7 +10,7 @@ export PYTHONPATH=".:$PYTHONPATH/Users/$USER"
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # load compinit (must come before any plugins that use compdef)
-autoload -Uz compinit && compinit
+autoload -Uz compinit && compinit -d "$HOME/.zcompdump"
 
 # zsh-autosuggestions: https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md#homebrew
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh

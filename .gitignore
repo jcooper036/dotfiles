@@ -2,3 +2,4 @@
 .worktrees/
 tmp/
 node_modules/
+.zcompdump*
