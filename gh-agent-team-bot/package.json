@@ -1,0 +1,23 @@
+{
+  "name": "gh-agent-team-bot",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "bun test",
+    "check": "tsc --noEmit",
+    "doctor": "bun src/cli.ts doctor",
+    "install:claude": "bun src/install.ts install claude",
+    "install:codex": "bun src/install.ts install codex",
+    "install:both": "bun src/install.ts install both",
+    "uninstall:claude": "bun src/install.ts uninstall claude",
+    "uninstall:codex": "bun src/install.ts uninstall codex",
+    "uninstall:both": "bun src/install.ts uninstall both"
+  },
+  "dependencies": {
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.0",
+    "typescript": "^5.9.0"
+  }
+}

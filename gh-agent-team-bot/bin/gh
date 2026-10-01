@@ -1,0 +1,2 @@
+#!/bin/sh
+exec "$HOME/.bun/bin/bun" "$HOME/dotfiles/gh-agent-team-bot/src/cli.ts" gh "$@"

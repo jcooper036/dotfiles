@@ -1,3 +1,8 @@
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=100000
+SAVEHIST=100000
+setopt HIST_IGNORE_SPACE
+
 # path
 export PATH="/opt/homebrew/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
@@ -5,7 +10,7 @@ export PYTHONPATH=".:$PYTHONPATH/Users/$USER"
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # load compinit (must come before any plugins that use compdef)
-autoload -Uz compinit && compinit
+autoload -Uz compinit && compinit -d "$HOME/.zcompdump"
 
 # zsh-autosuggestions: https://github.com/zsh-users/zsh-autosuggestions/blob/master/INSTALL.md#homebrew
 source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -69,17 +74,14 @@ function py() {
 }
 
 # secrets
+function load_secrets() {
+  local file
+  for file in $HOME/.secrets/*.env(N.); do
+    source "$file"
+  done
+}
 alias secret_load='load_secrets'
 alias secret_add='vim $HOME/.secrets/misc.env'
-# load secrets if the file exists
-function load_secrets() {
-  if [[ -d "$HOME/.secrets" ]]; then
-    for file in "$HOME/.secrets"/*(N.); do
-      source "$file"
-    done
-  fi
-}
-# call the loader
 load_secrets
 
 # port process commands
