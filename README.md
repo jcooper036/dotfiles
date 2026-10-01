@@ -52,6 +52,7 @@ There are two things to install to make sure brew is up and running.
 - `eza` is a long term project extension of exa, which is an ls augment (https://github.com/z-shell/zsh-eza). 
 - `starship` is the terminal customization tool (replacement for powerlevel10K which is not being developed anymore). 
 - `zoxide` is a navigation tool with memory, far supperior to cd (https://github.com/ajeetdsouza/zoxide). 
+- `fzf` is a fuzzy finder, used by the `gws` worktree picker (https://github.com/junegunn/fzf).
 ```zsh
 brew install uv
 brew install eza
@@ -60,6 +61,7 @@ brew install zoxide
 brew install nvim
 brew install zsh-autosuggestions
 brew install ripgrep
+brew install fzf
 ```
 
 ## Bring in this repo 
@@ -77,6 +79,17 @@ touch ~/.zshrc.local
 This config will always load first, and at the end it attempts to load ~/.zshrc.local
 
 Aliases live in `zshrc`, including aliases for scripts shipped inside Claude skills (see [claude/README.md](claude/README.md)).
+
+## Worktrees
+`zsh/worktrees.zsh`, sourced by `zshrc`, moves between git worktrees. Worktrees always live at `<repo root>/.worktrees/<branch>`. Switching keeps the current subdirectory when it exists in the target.
+- `gws <branch>`: cd to the branch's worktree, creating the worktree (and the branch, from HEAD) if needed
+- `gws`: pick a worktree with fzf
+- `gws --split <branch>`: open the worktree in a new tmux pane instead
+- `gwr`: cd to the main checkout
+- `cug`: `gwr`, then checkout trunk and pull
+- `gwa`: `git worktree add`
+
+`gws` and `gwa` register worktrees with zoxide, so `z <name>` works before the first visit.
 
 
 # starship_config
