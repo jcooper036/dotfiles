@@ -55,10 +55,11 @@ alias commit='git commit'
 alias push='git push'
 alias pull='git pull'
 alias checkout='git checkout'
-alias cug="git checkout trunk;git pull"
+alias cug="gwr && git checkout trunk && git pull"
 alias gwl="git worktree list"
 alias gwp="git worktree prune;git worktree list"
-alias gwa="git worktree add"
+alias gwa="_wt_track_new git worktree add"
+source $HOME/dotfiles/zsh/worktrees.zsh
 alias cleanup-git="$HOME/dotfiles/claude/skills/cleanup/scripts/cleanup-git"
 alias cleanup-docker="$HOME/dotfiles/claude/skills/cleanup/scripts/cleanup-docker"
 alias cleanup-processes="$HOME/dotfiles/claude/skills/cleanup/scripts/cleanup-processes"
