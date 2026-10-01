@@ -9,6 +9,15 @@ export PATH="$HOME/.local/bin:$PATH"
 export PYTHONPATH=".:$PYTHONPATH/Users/$USER"
 export PATH="$HOME/.cargo/bin:$PATH"
 
+# fzf for completion
+export FZF_DEFAULT_OPTS='--layout=reverse --border'
+export FZF_TMUX_OPTS='-p 80%,60%'
+export FZF_CTRL_T_COMMAND='rg --files --hidden --glob "!.git"'
+export FZF_CTRL_T_OPTS="--preview 'head -200 {}'"
+export FZF_ALT_C_OPTS="--preview 'eza --tree --level=2 --color=always {}'"
+export FZF_CTRL_R_OPTS="--bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort' --header 'ctrl-y: copy'"
+source <(fzf --zsh)
+
 # load compinit (must come before any plugins that use compdef)
 autoload -Uz compinit && compinit -d "$HOME/.zcompdump"
 
@@ -115,6 +124,9 @@ function auto_venv_switch() {
         deactivate
     fi
 }
+
+# fzf for completion
+source <(fzf --zsh)
 
 # Load the add-zsh-hook utility
 autoload -U add-zsh-hook
