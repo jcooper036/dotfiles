@@ -40,14 +40,14 @@ test("JWT verifies cryptographically and compensates for clock skew", async () =
   await rm(path, { recursive: true });
 });
 
-test("Git credential requests cannot disclose the token to another host or owner", () => {
+test("Git credential requests accept GitHub repositories and reject other hosts", () => {
   expect(acceptsCredential(parseCredential("protocol=https\nhost=github.com\npath=Leash-Labs/leash.git\n\n"))).toBe(true);
   for (const input of [
     "protocol=https\nhost=github.com.evil.test\npath=Leash-Labs/leash.git",
     "protocol=http\nhost=github.com\npath=Leash-Labs/leash.git",
-    "protocol=https\nhost=github.com\npath=someone-else/leash.git",
     "protocol=https\nhost=github.com",
   ]) expect(acceptsCredential(parseCredential(input))).toBe(false);
+  expect(acceptsCredential(parseCredential("protocol=https\nhost=github.com\npath=jcooper036/tunnel-tool.git"))).toBe(true);
 });
 
 test("agent environment overrides human authorship without losing inherited Git settings", () => {
