@@ -36,7 +36,7 @@ async function gh(args: string[]): Promise<void> {
 export async function gitCommandEnvironment(args: string[], source: Environment, select = repositoryToken, directory = process.cwd()): Promise<Environment> {
   const env = gitEnvironment(source);
   const { operation, options } = gitInvocation(args);
-  if (!operation || !["commit", "merge", "cherry-pick", "rebase", "am", "tag"].includes(operation)) return env;
+  if (!operation || !["commit", "merge", "cherry-pick", "rebase", "am", "tag", "revert", "pull", "stash", "commit-tree"].includes(operation)) return env;
   const repository = gitRepository(options, source, directory);
   if (!repository) return env;
   const identity = await select(repository);

@@ -15,3 +15,9 @@ test("explicit repository arguments override context", () => {
   expect(() => argumentRepository(["pr", "create", "--repo", "invalid"])).toThrow();
   expect(() => argumentRepository(["pr", "create", "-R", "Leash-Labs/leash", "--repo=jcooper036/tunnel-tool"])).toThrow("Conflicting");
 });
+
+test("URLs in issue bodies never change the selected identity", () => {
+  expect(argumentRepository(["issue", "create", "--body", "https://github.com/jcooper036/tunnel-tool"])).toBeUndefined();
+  expect(argumentRepository(["pr", "view", "--json", "number", "https://github.com/jcooper036/tunnel-tool/pull/2"])).toBe("jcooper036/tunnel-tool");
+  expect(argumentRepository(["api", "--method", "POST", "repos/Leash-Labs/leash/issues", "--raw-field", "body", "https://github.com/jcooper036/tunnel-tool"])).toBe("Leash-Labs/leash");
+});

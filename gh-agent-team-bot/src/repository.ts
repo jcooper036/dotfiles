@@ -25,15 +25,29 @@ export function argumentRepository(args: string[]): string | undefined {
     }
   }
   if (selected) return selected;
-  const url = args.find((argument) => argument.startsWith("https://github.com/"));
+  const operand = positionalTarget(args);
+  const targeted = ["pr", "issue", "repo", "run", "release"].includes(args[0]) && !["create", "list", "status"].includes(args[1]);
+  const url = targeted && operand?.startsWith("https://github.com/") ? operand : undefined;
   if (url) return parseRepository(url);
   if (args[0] === "api") {
-    const endpoint = args.find((argument) => /^\/?repos\//.test(argument));
+    const endpoint = operand && /^\/?repos\//.test(operand) ? operand : undefined;
     return endpoint ? parseRepository(endpoint.replace(/^\/?repos\//, "")) : undefined;
   }
   if (args[0] === "repo" && ["clone", "view", "fork", "create"].includes(args[1])) {
-    const target = args[2];
+    const target = operand;
     if (target && !target.startsWith("-")) return parseRepository(target);
+  }
+  return undefined;
+}
+
+export function positionalTarget(args: string[]): string | undefined {
+  const start = args[0] === "api" ? 1 : 2;
+  const booleans = new Set(["--web", "-w", "--comments", "--draft", "-d", "--reopen", "--approve", "-a", "--request-changes", "-r", "--comment", "--delete-branch", "--merge", "--squash", "--rebase", "--auto", "--admin", "--paginate", "--slurp", "--silent", "--include", "--verbose"]);
+  for (let index = start; index < args.length; index += 1) {
+    const value = args[index];
+    if (value === "--") return args[index + 1];
+    if (!value.startsWith("-")) return value;
+    if (!value.includes("=") && !booleans.has(value)) index += 1;
   }
   return undefined;
 }
