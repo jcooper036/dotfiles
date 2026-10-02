@@ -1,5 +1,6 @@
-import { accessToken, rejectToken } from "./auth.ts";
-import { owner } from "./config.ts";
+import { rejectToken } from "./auth.ts";
+import { repositoryToken } from "./identity.ts";
+import { parseRepository } from "./repository.ts";
 
 export function parseCredential(input: string): Record<string, string> {
   return Object.fromEntries(input.split("\n").filter((line) => line.includes("=")).map((line) => {
@@ -10,18 +11,18 @@ export function parseCredential(input: string): Record<string, string> {
 
 export function acceptsCredential(input: Record<string, string>): boolean {
   return input.protocol === "https" && input.host === "github.com"
-    && input.path?.split("/")[0]?.toLowerCase() === owner.toLowerCase();
+    && parseRepository(input.path ?? "") !== undefined;
 }
 
-export async function credential(operation: string): Promise<void> {
-  const input = parseCredential(await Bun.stdin.text());
+export async function credential(operation: string, source?: string, select = repositoryToken, output: (value: string) => void = (value) => { process.stdout.write(value); }): Promise<void> {
+  const input = parseCredential(source ?? await Bun.stdin.text());
   if (operation === "store") return;
   if (operation === "erase" && acceptsCredential(input)) return rejectToken();
   if (operation !== "get") return;
   if (!acceptsCredential(input)) {
-    process.stdout.write("quit=true\n\n");
+    output("quit=true\n\n");
     return;
   }
-  const issued = await accessToken();
-  process.stdout.write(`username=x-access-token\npassword=${issued.token}\n\n`);
+  const issued = await select(parseRepository(input.path)!);
+  output(`username=x-access-token\npassword=${issued.token}\n\n`);
 }

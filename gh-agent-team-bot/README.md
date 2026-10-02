@@ -27,7 +27,7 @@ bun install
 bun run install:claude
 ```
 
-This patches only the environment in `~/.claude/settings.json`. Restart Claude Code. Every local Claude Code session using that user configuration will then use the bot for GitHub operations and Git authorship.
+This patches only the environment in `~/.claude/settings.json`. Restart Claude Code. Local sessions prefer the bot for repositories available to its installation and use the saved `jcooper036` login elsewhere.
 
 ## Enable Codex on this machine
 
@@ -35,7 +35,7 @@ This patches only the environment in `~/.claude/settings.json`. Restart Claude C
 bun run install:codex
 ```
 
-This patches only `shell_environment_policy.set` in `~/.codex/config.toml`. Restart Codex. Local Codex sessions using that user configuration will then use the bot. Use `bun run install:both` to opt in both tools.
+This patches only `shell_environment_policy.set` in `~/.codex/config.toml`. Restart Codex. Local sessions prefer the bot for repositories available to its installation and use the saved `jcooper036` login elsewhere. Use `bun run install:both` to opt in both tools.
 
 ## Choose individual sessions instead
 
@@ -57,13 +57,15 @@ bun run uninstall:codex
 
 Use `bun run uninstall:both` for both. Restart the affected tools. Uninstall restores the settings this installer replaced and preserves unrelated settings and subsequent user edits. It leaves the private key and token cache in place. Configuration backups and installation state live under `~/.cache/gh-agent-team-bot`.
 
-## Authentication stays inside opted-in processes
+## Repository access selects the identity
 
-The helper signs an app JWT with the PEM, discovers the Leash-Labs installation, and obtains an installation token through `gh api`. Tokens stay in an owner-only cache and renew five minutes before expiry. Authentication errors stop the command. Agent `gh` uses a separate configuration directory without Jacob's saved login.
+The helper signs an app JWT with the PEM and obtains an installation token through `gh api`. Tokens stay in an owner-only cache and renew five minutes before expiry. Repositories in the installation use the bot. Other repositories use the saved `jcooper036` GitHub CLI token, whose account is verified before use. Bot authentication or network errors stop the command; writes are never retried under another identity.
 
-Agent sessions set bot author and committer metadata. Git rewrites standard GitHub SSH URLs to HTTPS in the process environment and uses the credential helper only for `github.com/Leash-Labs`. Repository remotes, global Git configuration, and shared shell configuration stay unchanged. Existing commits, explicit author overrides, and coauthor trailers retain their own attribution.
+GitHub CLI selects the repository from `--repo`, a GitHub URL, a repository API endpoint, `GH_REPO`, or local remotes. Multiple local repositories require an explicit selection or a configured GitHub CLI default. Commands without repository context use the bot. GraphQL queries require repository context because query contents are not inspected.
 
-Agent-specific shell startup files preserve wrapper precedence when macOS login shells rebuild `PATH`. They load the user's existing startup files; they do not replace or edit them. These wrappers separate normal identities, not processes deliberately accessing credentials under Jacob's OS account.
+Git routes HTTPS credentials by repository and rewrites standard GitHub SSH URLs inside the agent environment. Commands that create commits or tags inspect the target checkout's origin: installed repositories use bot metadata; other repositories use normal Git author and committer configuration. Existing commits, explicit author overrides, and coauthor trailers retain their attribution. Repository remotes, global Git configuration, and shared shell configuration stay unchanged.
+
+Agent-specific shell startup files preserve wrapper precedence when macOS login shells rebuild `PATH`. They load the user's existing startup files; they do not replace or edit them. These wrappers route identities for convenience; they do not isolate credentials from processes running under Jacob's OS account.
 
 ## Verify from the agent's shell
 
