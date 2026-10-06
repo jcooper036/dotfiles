@@ -1,1 +1,2 @@
 font-family = "Hack Nerd Font Mono" 
+keybind = global:alt+space=toggle_visibility
