@@ -44,7 +44,7 @@ M.mason = {
     "shfmt",
 
     -- python stuff
-    "pyright",
+    "ty",
   },
 }
 
