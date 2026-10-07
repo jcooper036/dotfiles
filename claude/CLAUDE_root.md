@@ -64,9 +64,6 @@ It's CRTICAL that we surface information, not answers. Information gives future 
 - keep pushing follow-up work to the same PR until the user says it is done
 - before the first commit, confirm secrets (.env, tokens, user / channel ids) are git ignored
 
-### writing commits
-- ALWAYS include the commit trailer "Co-Authored-By: {model} <noreply@anthropic.com>"
-
 ## Sub-agents
 - use sub-agents when sequential work is not required: one sub-agent per independent item (feature, dataset, problem)
 - when delegating, your primary task is to farm out work and collect it. do not start doing a delegated item yourself

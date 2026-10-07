@@ -184,9 +184,7 @@ Report: "PR #N merged. Issue #M closed. <one sentence on what it fixed>."
 4. Commit and push:
    ```bash
    git add <files>
-   git commit -m "fix: address reviewer corrections
-
-Co-Authored-By: Claude claude-opus-4-6 <noreply@anthropic.com>"
+   git commit -m "fix: address reviewer corrections"
    git push
    ```
 
