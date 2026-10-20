@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+CODEX=/Users/jacob/.local/bin/codex
+MODEL=gpt-6-astra
+EFFORT=medium
+SANDBOX=read-only
+DIR=$PWD
+THREAD=""
+OUT=""
+
+usage() {
+  printf 'usage: codex-turn -o OUTDIR [-t THREAD] [-C DIR] [-s SANDBOX] [-e EFFORT] [-m MODEL] PROMPT_FILE\n' >&2
+  exit 2
+}
+
+while getopts "o:t:C:s:e:m:h" opt; do
+  case $opt in
+    o) OUT=$OPTARG ;;
+    t) THREAD=$OPTARG ;;
+    C) DIR=$OPTARG ;;
+    s) SANDBOX=$OPTARG ;;
+    e) EFFORT=$OPTARG ;;
+    m) MODEL=$OPTARG ;;
+    *) usage ;;
+  esac
+done
+shift $((OPTIND - 1))
+PROMPT=${1:-}
+[ -n "$OUT" ] && [ -f "$PROMPT" ] || usage
+
+probe() {
+  [ -x "$CODEX" ] || { printf 'error: %s not executable\n' "$CODEX" >&2; exit 127; }
+  "$CODEX" login status >/dev/null 2>&1 || { printf 'error: codex login status failed; run: codex login\n' >&2; exit 1; }
+}
+
+run_new() {
+  "$CODEX" exec --json --skip-git-repo-check -m "$MODEL" -s "$SANDBOX" -C "$DIR" \
+    -c model_reasoning_effort="$EFFORT" -o "$OUT/last.md" - < "$PROMPT"
+}
+
+run_resume() {
+  (cd "$DIR" && "$CODEX" exec resume --json --skip-git-repo-check -m "$MODEL" \
+    -c model_reasoning_effort="$EFFORT" -o "$OUT/last.md" "$THREAD" - < "$PROMPT")
+}
+
+probe
+mkdir -p "$OUT"
+rm -f "$OUT/last.md"
+TURN=$(date +%Y%m%dT%H%M%S)
+cp "$PROMPT" "$OUT/prompt-$TURN.md"
+if [ -n "$THREAD" ]; then run_resume; else run_new; fi > "$OUT/events-$TURN.jsonl" 2> "$OUT/stderr-$TURN.log"
+CODE=$?
+ID=$(grep -m1 -o '"thread_id":"[^"]*"' "$OUT/events-$TURN.jsonl" | cut -d'"' -f4)
+[ -n "$ID" ] && printf '%s\n' "$ID" > "$OUT/thread_id"
+[ -f "$OUT/last.md" ] && cp "$OUT/last.md" "$OUT/reply-$TURN.md"
+printf 'thread=%s exit=%s turn=%s out=%s\n' "${ID:-none}" "$CODE" "$TURN" "$OUT"
+[ "$CODE" -eq 0 ] && [ -f "$OUT/last.md" ] && cat "$OUT/last.md" && printf '\n'
+exit "$CODE"
