@@ -8,9 +8,11 @@ graph LR
     REPO["~/dotfiles/"] --> ZSHRC["zshrc"]
     REPO --> STARSHIP["starship.toml"]
     REPO --> NVIM["nvim/custom/"]
+    REPO --> OMP["omp/"]
 
     ZSHRC -->|symlink| SYS_ZSH["~/.zshrc"]
     NVIM -->|symlink| SYS_NVIM["~/.config/nvim/lua/custom/"]
+    OMP -->|symlink config/, copy defaults/| SYS_OMP["~/.omp/agent/"]
 
     SYS_ZSH --> SHELL["Shell loads:<br/>PATH, tools, aliases"]
     SHELL --> SECRETS["~/.secrets/*.env<br/>(auto-loaded)"]
@@ -24,7 +26,7 @@ graph LR
     classDef secret fill:#474747,stroke:#b71c1c,stroke-dasharray:5 5
 
     class REPO repo
-    class ZSHRC,STARSHIP,NVIM,SYS_ZSH,SYS_NVIM sys
+    class ZSHRC,STARSHIP,NVIM,OMP,SYS_ZSH,SYS_NVIM,SYS_OMP sys
     class SECRETS,LOCAL secret
 ```
 
@@ -143,4 +145,4 @@ Claude Code config, skills and agent instructions. Setup and symlinks: [claude/R
 Optional workplace-specific GitHub bot authentication: [gh-agent-team-bot](gh-agent-team-bot/README.md). Installing these dotfiles does not enable it.
 
 # omp
-[omp](https://omp.sh/docs) config and personal tools, including the Gmail MCP server for agents. Setup and symlinks: [omp/README.md](omp/README.md).
+[omp](https://omp.sh/docs) config and personal tools, including the Gmail MCP server for agents. Run `~/dotfiles/omp/install.sh` from the main checkout to link it into `~/.omp/agent/`. What is linked, what is copied, and what stays local: [omp/README.md](omp/README.md).
