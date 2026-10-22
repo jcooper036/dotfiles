@@ -39,7 +39,7 @@ If those lines are missing, the server refuses to create grants. Headless runs a
 
 Before `send_draft` sends anything:
 1. **Mechanical checks.** The grant must be active. Every To, Cc, and Bcc address must be inside it. Nobody in the thread may be outside it besides you and your send-as aliases, so if someone adds a new person to the thread, the send is held. No attachments unless the grant allows them. A daily send cap applies.
-2. **Independent review.** A separate model (`reviewer_model` in `~/.config/omp-gmail/config.json`, default `sonnet`, run through `omp -p`) sees only the grant, the thread, and the draft. It holds the message if it:
+2. **Independent review.** A separate model (`reviewer_model` in `~/.config/omp-gmail/config.json`, default `sonnet`) sees only the grant, the thread, and the draft. It runs through `omp -p` with no usable tools: this server refuses to start inside it, `always-ask` approval makes other MCP tools fail headless, and any attempted tool call holds the send. It holds the message if it:
    - commits you to money, time, or an agreement
    - goes beyond the grant's scope
    - discloses information the scope doesn't call for

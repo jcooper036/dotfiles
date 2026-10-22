@@ -2,9 +2,15 @@
 
 The reviewer sees only the grant, the thread, and the draft, never the sending agent's reasoning, so
 the agent can't argue it into approving. Any failure (timeout, bad output, missing omp) holds the send.
+
+The reviewer runs as `omp -p`, which would normally load the user's MCP servers, including this one.
+Three locks keep it tool-less: REVIEWER_ENV makes this server refuse to start inside it, approval mode
+`always-ask` makes every other MCP or write tool fail in headless print mode, and any attempted tool
+call (a sign the email tried to steer the reviewer) holds the send.
 """
 
 import json
+import os
 import shutil
 import subprocess
 import tempfile
@@ -13,6 +19,7 @@ from typing import Any
 
 from .grants import Grant
 
+REVIEWER_ENV = "OMP_GMAIL_REVIEWER"  # set in the reviewer's environment; this server refuses to start under it
 TIMEOUT_SECONDS = 90  # must stay under the MCP call timeout in omp/mcp.json (120 s)
 MAX_THREAD_MESSAGES = 8
 MAX_BODY_CHARS = 4000
@@ -72,15 +79,39 @@ def review(model: str, grant: Grant, account: str, thread: list[dict[str, Any]],
     if omp is None:
         return {"decision": "hold", "reasons": ["reviewer unavailable: `omp` is not on PATH"], "model": model}
     command = [
-        omp, "-p", "--no-tools", "--no-session", "--no-skills", "--no-rules", "--no-extensions", "--no-lsp", "--no-title",
+        omp, "-p", "--mode", "json", "--approval-mode", "always-ask", "--tools", "todo",
+        "--no-session", "--no-skills", "--no-rules", "--no-extensions", "--no-lsp", "--no-title",
         "--model", model, "--thinking", "low", "--system-prompt", SYSTEM_PROMPT, build_prompt(grant, account, thread, draft),
     ]
     try:
         with tempfile.TemporaryDirectory() as empty_cwd:  # no project context files leak into the review
-            result = subprocess.run(command, cwd=empty_cwd, capture_output=True, text=True, timeout=TIMEOUT_SECONDS)
+            result = subprocess.run(
+                command, cwd=empty_cwd, capture_output=True, text=True, timeout=TIMEOUT_SECONDS,
+                env=os.environ | {REVIEWER_ENV: "1"},
+            )
         if result.returncode != 0:
             raise ValueError(f"omp exited {result.returncode}: {result.stderr.strip()[-300:]}")
-        verdict = _parse(result.stdout)
+        tool_calls, text = _read_events(result.stdout)
+        if tool_calls:
+            raise ValueError(f"reviewer tried to call tools ({', '.join(tool_calls)}); treating the thread as hostile")
+        verdict = _parse(text)
     except (subprocess.TimeoutExpired, ValueError, json.JSONDecodeError) as exc:
         return {"decision": "hold", "reasons": [f"reviewer failed, holding by default: {exc}"], "model": model}
     return {"decision": verdict["decision"], "reasons": [str(r) for r in verdict.get("reasons", [])], "model": model}
+
+
+def _read_events(stdout: str) -> tuple[list[str], str]:
+    """From `omp --mode json` output: names of attempted tool calls, and the final assistant text."""
+    tool_calls: list[str] = []
+    text = ""
+    for line in stdout.splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") == "tool_execution_start":
+            tool_calls.append(str(event.get("toolName")))
+        elif event.get("type") == "agent_end" and event.get("messages"):
+            content = event["messages"][-1].get("content") or []
+            text = "".join(c.get("text", "") for c in content if isinstance(c, dict) and c.get("type") == "text")
+    return tool_calls, text

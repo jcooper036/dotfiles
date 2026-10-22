@@ -1,6 +1,8 @@
 """MCP server exposing Gmail read, organize, attachment, draft, and grant-gated send tools."""
 
 import functools
+import os
+import sys
 import threading
 from collections.abc import Callable
 from pathlib import Path
@@ -13,7 +15,7 @@ from mcp.server.mcpserver.exceptions import ToolError
 from mcp.types import ToolAnnotations
 from pydantic import Field
 
-from . import auth, config, grants, mail, safety, sending
+from . import auth, config, grants, mail, reviewer, safety, sending
 
 INSTRUCTIONS = """\
 Tools for the user's Gmail mailbox (one account per machine, configured with `omp-gmail setup`).
@@ -324,4 +326,6 @@ def send_draft(grant_id: str, draft_id: str) -> dict[str, Any]:
 
 
 def serve() -> None:
+    if os.environ.get(reviewer.REVIEWER_ENV):
+        sys.exit("omp-gmail: not serving Gmail tools inside the send reviewer.")
     mcp.run("stdio")
