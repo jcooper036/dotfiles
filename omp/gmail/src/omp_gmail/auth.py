@@ -19,7 +19,7 @@ from keyring.errors import PasswordDeleteError
 from . import config
 
 # gmail.modify is the narrowest scope that covers reading, labels, trash, and drafts.
-# It also technically permits sending; this server never exposes or calls a send endpoint.
+# It also permits sending; the server sends only through send_draft, under a user-approved send grant.
 SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
 KEYRING_SERVICE = "omp-gmail"
 

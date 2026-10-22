@@ -11,6 +11,8 @@ from pathlib import Path
 CONFIG_DIR = Path(os.environ.get("OMP_GMAIL_HOME") or Path.home() / ".config" / "omp-gmail")
 CONFIG_FILE = CONFIG_DIR / "config.json"
 CLIENT_SECRETS_FILE = CONFIG_DIR / "client_secret.json"
+GRANTS_FILE = CONFIG_DIR / "send_grants.json"
+SEND_LOG_FILE = CONFIG_DIR / "send_log.jsonl"
 
 
 class NotConfigured(RuntimeError):
@@ -25,6 +27,8 @@ class Config:
     logged_in_at: str | None = None
     # Set when Google issued a time-limited refresh token (e.g. an External app still in "Testing").
     refresh_expires_at: str | None = None
+    # Model (omp fuzzy name) that independently reviews every agent send before it goes out.
+    reviewer_model: str = "sonnet"
 
 
 def load() -> Config:

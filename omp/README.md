@@ -19,8 +19,39 @@ In a running omp session, `/mcp reload` picks up changes.
 | `trash`, `untrash` | Move to or from Trash (recoverable for 30 days) |
 | `download_attachment` | Checks the file type first, then saves it. Never overwrites an existing file |
 | `create_draft`, `update_draft`, `list_drafts`, `get_draft`, `delete_draft` | Drafts with local file attachments. Threaded replies and reply-all |
+| `request_send_grant`, `add_grant_recipients`, `list_send_grants`, `revoke_send_grant` | Manage your permission for agents to send (see below) |
+| `send_draft` | Send an existing draft under a send grant |
 
-**There is no send tool.** Agents write drafts and you press send in Gmail. The OAuth scope (`gmail.modify`) technically allows sending, but the server never calls a send endpoint.
+**Sending is off unless you grant it.** Agents write drafts by default. An agent can send only under a **send grant**, which is permission with explicit bounds:
+- **who** it may email: exact addresses, or `*@company.com`. Consumer domains like `*@gmail.com` are refused.
+- **until when**: at most 30 days
+- **what** it may say
+- **how to escalate** to you for anything else
+
+An agent requests a grant with `request_send_grant`, quoting your instruction. omp then shows you the exact terms, and you approve or deny. Adding new recipients later (`add_grant_recipients`) asks you again. Both approvals come from `tools.approval` in `~/.omp/agent/config.yml`:
+```yaml
+tools:
+  approval:
+    mcp__gmail_request_send_grant: prompt
+    mcp__gmail_add_grant_recipients: prompt
+```
+If those lines are missing, the server refuses to create grants. Headless runs and subagents can't answer a prompt, so they can't get a grant at all.
+
+Before `send_draft` sends anything:
+1. **Mechanical checks.** The grant must be active. Every To, Cc, and Bcc address must be inside it. Nobody in the thread may be outside it besides you and your send-as aliases, so if someone adds a new person to the thread, the send is held. No attachments unless the grant allows them. A daily send cap applies.
+2. **Independent review.** A separate model (`reviewer_model` in `~/.config/omp-gmail/config.json`, default `sonnet`, run through `omp -p`) sees only the grant, the thread, and the draft. It holds the message if it:
+   - commits you to money, time, or an agreement
+   - goes beyond the grant's scope
+   - discloses information the scope doesn't call for
+   - follows instructions that came from an email
+
+   If the reviewer fails or is unsure, the message is held.
+
+A held message stays in Drafts, and the agent is told to escalate. A sent message gets the `agent-sent` label. Every send and every hold is logged to `~/.config/omp-gmail/send_log.jsonl`. Commands:
+- `omp-gmail grants` lists grants with their sent and held counts.
+- `omp-gmail revoke <id>` stops a grant immediately.
+
+These checks cover agents going through the tools: prompt injection and mistakes. They don't stop an agent that deliberately goes around the server with a shell. The Gmail token can already send, and processes running as you can read it from the Keychain and the grant file.
 
 **Attachment screening** is a type blocklist (`gmail/src/omp_gmail/safety.py`), not antivirus. It runs on the bytes before anything is written, and refuses:
 - executables, scripts, and installers, matched by extension, MIME type, or magic bytes, so a renamed `.exe` is still refused

@@ -9,7 +9,7 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
-from . import auth, config
+from . import auth, config, grants
 
 CONSOLE = "https://console.cloud.google.com"
 CONSUMER_DOMAINS = ("@gmail.com", "@googlemail.com")
@@ -227,14 +227,36 @@ def status() -> int:
     return 0
 
 
+def show_grants() -> None:
+    log = grants.read_log()
+    all_grants = grants.list_grants(include_inactive=True)
+    if not all_grants:
+        print("No send grants.")
+    for g in all_grants:
+        status = g.status()
+        colored = good(status) if status == "active" else dim(status)
+        sent = sum(1 for e in log if e.get("grant_id") == g.id and e.get("result") == "sent")
+        held = sum(1 for e in log if e.get("grant_id") == g.id and e.get("result") == "held")
+        print(f"{bold(g.id)}  {colored}  expires {g.expires_at}  sent {sent}, held {held}")
+        print(f"  recipients: {', '.join(g.recipients)}")
+        print(f"  scope:      {g.scope}")
+        print(f"  escalation: {g.escalation}")
+        print(dim(f"  instruction: {g.user_instruction}"))
+    print(dim(f"\nFull send log: {_home(config.SEND_LOG_FILE)}"))
+
+
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="omp-gmail", description="Gmail tools for omp agents (no sending).")
+    parser = argparse.ArgumentParser(prog="omp-gmail", description="Gmail tools for omp agents.")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("setup", help="choose account + GCP project, create the OAuth client, sign in")
     sub.add_parser("login", help="sign in again with the configured account")
     sub.add_parser("status", help="show configuration and check the stored sign-in")
+    sub.add_parser("grants", help="list send grants and how many messages each sent or held")
+    revoke_parser = sub.add_parser("revoke", help="revoke a send grant immediately")
+    revoke_parser.add_argument("grant_id")
     sub.add_parser("serve", help="run the MCP server on stdio (used by omp)")
-    command = parser.parse_args().command
+    args = parser.parse_args()
+    command = args.command
     try:
         if command == "serve":
             from .server import serve
@@ -244,9 +266,13 @@ def main() -> None:
             setup()
         elif command == "login":
             login()
+        elif command == "grants":
+            show_grants()
+        elif command == "revoke":
+            print(f"Revoked {grants.revoke(args.grant_id).id}.")
         else:
             sys.exit(status())
-    except (config.NotConfigured, auth.NotSignedIn) as exc:
+    except (config.NotConfigured, auth.NotSignedIn, grants.GrantError) as exc:
         sys.exit(str(exc))
     except KeyboardInterrupt:
         sys.exit(130)
