@@ -21,6 +21,9 @@ The agent dir also holds logins and API keys (`agent.db`), prompt history, the m
 ## MCP servers
 `config/mcp.json` is omp's user-level MCP config, linked like everything else in `config/`. In a running omp session, `/mcp reload` picks up changes.
 
+## GitHub identity
+omp has no persistent env setting, so the bot identity comes from the launcher: on machines with `~/.secrets/github_team_bot.env`, `zshrc` aliases `omp` to `gh-agent-team-bot run omp`. Subagents inherit it. Only interactive shells see the alias, so scripts and cron must call the launcher themselves. `command omp` launches without it.
+
 ## gmail
 `gmail/` is a local MCP server (Python, run through `uv`) that gives agents one Gmail account per machine (work account at work, personal account at home):
 
