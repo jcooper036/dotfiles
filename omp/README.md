@@ -37,20 +37,20 @@ Prerequisites: `uv`, plus `gcloud` signed in if you want existing GCP projects s
 source ~/.zshrc        # picks up the omp-gmail alias
 omp-gmail setup
 ```
-The wizard:
-1. Asks for the Gmail address.
-2. Lists the GCP projects `gcloud` can see and asks you to pick one, or type a project id. A Workspace account needs a project in its own org. A personal `@gmail.com` account can use any project you own.
-3. Enables the Gmail API in that project. If `gcloud` can't, it gives you a console link.
-4. Walks you through the OAuth consent screen:
+The wizard runs six numbered steps (`[1/6]` to `[6/6]`):
+1. **Gmail account**: the address, and the folder for downloaded attachments.
+2. **Google Cloud project**: lists the projects `gcloud` can see; pick one or type a project id. A Workspace account needs a project in its own org. A personal `@gmail.com` account can use any project you own.
+3. **Enable the Gmail API** in that project. If `gcloud` can't, it gives you a console link.
+4. **Sign in to the Google Cloud console and check the consent screen.** If the page shows an overview, it already exists and there's nothing to do. If it shows "Get started", fill it in:
    - Workspace account: set the audience to **Internal**.
    - `@gmail.com` account: set the audience to **External**, then **Publish app**. Apps left in Testing get sign-ins that expire after 7 days.
-5. Has you create a **Desktop app** OAuth client and finds the downloaded `client_secret_*.json` in `~/Downloads`.
-6. Opens the browser to sign in. It checks that the mailbox you signed into matches the address you gave.
+5. **Desktop OAuth client**: reuses an already-saved client, or offers the newest `client_secret_*.json` in `~/Downloads`. If neither exists, it links to the page that creates one.
+6. **Sign in to Gmail** in the browser. It checks that the mailbox you signed into matches the address you gave.
 
-Where things are stored (all on this machine; nothing goes in git):
-- `~/.config/omp-gmail/config.json`: account, project, download directory
-- `~/.config/omp-gmail/client_secret.json`: the OAuth client
-- macOS Keychain, service `omp-gmail`: the refresh token
+At the end it prints where everything was saved. All of it stays on this machine; nothing goes in git:
+- `~/.config/omp-gmail/config.json`: account, project, download folder
+- `~/.config/omp-gmail/client_secret.json`: a copy of the OAuth client (the original in `~/Downloads` can be deleted)
+- macOS Keychain, item `omp-gmail`: the refresh token
 
 ### Day to day
 - `omp-gmail status`: shows the account and checks the stored sign-in.
