@@ -1,0 +1,21 @@
+[project]
+name = "omp-gmail"
+version = "0.1.0"
+description = "Gmail MCP server for omp agents: read, organize, draft (never send)."
+authors = [
+    { name = "Jacob Cooper", email = "jcooper036@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "google-api-python-client>=2.201.0",
+    "google-auth-oauthlib>=1.5.0",
+    "keyring>=25.7.0",
+    "mcp>=2.3.0",
+]
+
+[project.scripts]
+omp-gmail = "omp_gmail.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.11.21,<0.12.0"]
+build-backend = "uv_build"
