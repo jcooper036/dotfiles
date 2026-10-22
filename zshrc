@@ -57,6 +57,8 @@ alias vim='nvim'
 # agent related
 # copies a template CLAUDE.md to the current project
 alias new_claude_md='cp ~/dotfiles/claude/CLAUDE_TEMPLATE.md ./CLAUDE.md'
+# Gmail tools for omp agents: `omp-gmail setup|login|status` (see omp/README.md)
+alias omp-gmail='uv run --quiet --project ~/dotfiles/omp/gmail omp-gmail'
 
 # git
 alias zrc='nvim ~/.zshrc'

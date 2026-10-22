@@ -141,3 +141,6 @@ nvim
 Claude Code config, skills and agent instructions. Setup and symlinks: [claude/README.md](claude/README.md).
 
 Optional workplace-specific GitHub bot authentication: [gh-agent-team-bot](gh-agent-team-bot/README.md). Installing these dotfiles does not enable it.
+
+# omp
+[omp](https://omp.sh/docs) config and personal tools, including the Gmail MCP server for agents. Setup and symlinks: [omp/README.md](omp/README.md).
