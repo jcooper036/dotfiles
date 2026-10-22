@@ -1,19 +1,16 @@
 """Send grants: user-approved, bounded permission for an agent to send email.
 
 Without an active grant nothing can be sent. A grant names who may be emailed, until when, what the
-agent may say, and how it escalates to the user. Creating a grant or widening its recipients goes
-through tools that omp must be configured to confirm with the user every time (see require_user_prompt).
+agent may say, and how it escalates to the user. Creating a grant or widening its recipients is saved
+only after the `approve` callback returns (the server shows the user a native dialog; see approval.py).
 """
 
 import json
-import os
 import secrets
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime, timedelta
 from email.utils import getaddresses
-from pathlib import Path
-
-import yaml
 
 from . import config
 
@@ -24,8 +21,6 @@ CONSUMER_DOMAINS = frozenset(
         "icloud.com", "me.com", "mac.com", "aol.com", "proton.me", "protonmail.com", "gmx.com", "hey.com",
     }
 )
-# omp tool names of the grant-widening tools; omp must prompt the user for each call.
-PROMPTED_TOOLS = ("mcp__gmail_request_send_grant", "mcp__gmail_add_grant_recipients")
 
 
 class GrantError(ValueError):
@@ -109,7 +104,9 @@ def get_active(grant_id: str) -> Grant:
 def create(
     user_instruction: str, recipients: list[str], scope: str, escalation: str,
     expires_in_days: int, max_sends_per_day: int, allow_attachments: bool,
+    approve: Callable[["Grant"], None],
 ) -> Grant:
+    """Validate the bounds, have the user approve the exact grant, then save it."""
     missing = [name for name, value in (("user_instruction", user_instruction), ("scope", scope), ("escalation", escalation)) if not value.strip()]
     if missing or not recipients:
         raise GrantError(f"A send grant needs explicit bounds; missing: {', '.join(missing + ([] if recipients else ['recipients']))}.")
@@ -127,17 +124,22 @@ def create(
         max_sends_per_day=max_sends_per_day,
         allow_attachments=allow_attachments,
     )
+    approve(grant)
     grants = _load()
     grants[grant.id] = grant
     _save(grants)
     return grant
 
 
-def add_recipients(grant_id: str, recipients: list[str], reason: str) -> Grant:
+def add_recipients(grant_id: str, recipients: list[str], reason: str, approve: Callable[["Grant", list[str]], None]) -> Grant:
+    """Have the user approve the new recipients for an active grant, then save them."""
     if not reason.strip():
         raise GrantError("Say why these recipients are being added.")
     grant = get_active(grant_id)
     added = sorted({normalize_recipient(r) for r in recipients} - set(grant.recipients))
+    if not added:
+        return grant
+    approve(grant, added)
     grant.recipients = sorted(set(grant.recipients) | set(added))
     grant.recipient_history.append({"at": _now().isoformat(timespec="seconds"), "added": added, "reason": reason.strip()})
     grants = _load()
@@ -179,33 +181,3 @@ def sends_in_last_day(grant_id: str) -> int:
         if e.get("grant_id") == grant_id and e.get("result") == "sent" and datetime.fromisoformat(e["at"]) > cutoff
     )
 
-
-# ---------------------------------------------------------------- user-approval guard
-
-
-def _omp_config_file() -> Path:
-    if override := os.environ.get("PI_CODING_AGENT_DIR"):
-        return Path(override) / "config.yml"
-    profile = os.environ.get("OMP_PROFILE") or os.environ.get("PI_PROFILE")
-    base = Path(os.environ.get("PI_CONFIG_DIR") or Path.home() / ".omp")
-    return (base / "profiles" / profile / "agent" if profile else base / "agent") / "config.yml"
-
-
-def require_user_prompt() -> None:
-    """Fail closed unless omp is configured to ask the user before every grant-widening call.
-
-    The approval itself happens in omp, outside this server; this check makes sure it can't be silently off.
-    """
-    path = _omp_config_file()
-    try:
-        settings = yaml.safe_load(path.read_text()) or {}
-    except (OSError, yaml.YAMLError):
-        settings = {}
-    approval = ((settings.get("tools") or {}).get("approval") or {}) if isinstance(settings, dict) else {}
-    unprompted = [t for t in PROMPTED_TOOLS if str(approval.get(t, "")).strip().lower() != "prompt"]
-    if unprompted:
-        lines = "\n".join(f"      {t}: prompt" for t in PROMPTED_TOOLS)
-        raise GrantError(
-            f"Send grants are disabled: omp is not set to ask the user before {', '.join(unprompted)}. "
-            f"The user must add this to {path}:\n  tools:\n    approval:\n{lines}"
-        )

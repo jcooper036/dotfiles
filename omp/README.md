@@ -28,14 +28,15 @@ In a running omp session, `/mcp reload` picks up changes.
 - **what** it may say
 - **how to escalate** to you for anything else
 
-An agent requests a grant with `request_send_grant`, quoting your instruction. omp then shows you the exact terms, and you approve or deny. Adding new recipients later (`add_grant_recipients`) asks you again. Both approvals come from `tools.approval` in `~/.omp/agent/config.yml`:
-```yaml
-tools:
-  approval:
-    mcp__gmail_request_send_grant: prompt
-    mcp__gmail_add_grant_recipients: prompt
-```
-If those lines are missing, the server refuses to create grants. Headless runs and subagents can't answer a prompt, so they can't get a grant at all.
+An agent requests a grant with `request_send_grant`, quoting your instruction. The server then opens a macOS dialog on your screen listing the exact terms:
+- your instruction, as the agent quoted it
+- who it may email
+- what it may say
+- the escalation path
+- the expiry
+- the daily limit and whether attachments are allowed
+
+Click **Approve** or **Deny**. Adding recipients later (`add_grant_recipients`) shows a dialog too. The agent can't answer the dialog. Unanswered after 4 minutes counts as Deny, and so does having no GUI session (SSH, headless runs).
 
 Before `send_draft` sends anything:
 1. **Mechanical checks.** The grant must be active. Every To, Cc, and Bcc address must be inside it. Nobody in the thread may be outside it besides you and your send-as aliases, so if someone adds a new person to the thread, the send is held. No attachments unless the grant allows them. A daily send cap applies.

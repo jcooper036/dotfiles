@@ -20,7 +20,7 @@ from typing import Any
 from .grants import Grant
 
 REVIEWER_ENV = "OMP_GMAIL_REVIEWER"  # set in the reviewer's environment; this server refuses to start under it
-TIMEOUT_SECONDS = 90  # must stay under the MCP call timeout in omp/mcp.json (120 s)
+TIMEOUT_SECONDS = 90  # must stay under the MCP call timeout in omp/mcp.json (300 s)
 MAX_THREAD_MESSAGES = 8
 MAX_BODY_CHARS = 4000
 
