@@ -7,6 +7,7 @@ from email import policy
 from email.message import EmailMessage
 from email.parser import BytesParser
 from email.utils import getaddresses
+from html import unescape
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any
@@ -44,9 +45,14 @@ def _charset(part: dict) -> str:
 def _decode_text(part: dict) -> str:
     raw = _b64decode(part["body"].get("data", ""))
     try:
-        return raw.decode(_charset(part), errors="replace")
+        text = raw.decode(_charset(part), errors="replace")
     except LookupError:
-        return raw.decode("utf-8", errors="replace")
+        text = raw.decode("utf-8", errors="replace")
+    return text.replace("\r\n", "\n")
+
+
+def _snippet(msg: dict) -> str:
+    return unescape(msg.get("snippet", ""))  # Gmail returns snippets HTML-escaped
 
 
 class _HTMLToText(HTMLParser):
@@ -222,7 +228,7 @@ def search_threads(service, labels: Labels, query: str, max_results: int, page_t
                 "last_date": last.get("date", ""),
                 "message_count": len(messages),
                 "labels": labels.names(sorted({i for m in messages for i in m.get("labelIds", [])})),
-                "snippet": messages[-1].get("snippet", ""),
+                "snippet": _snippet(messages[-1]),
             }
         )
     return {"threads": out, "next_page_token": listing.get("nextPageToken")}
@@ -474,7 +480,7 @@ def list_drafts(service, query: str | None, max_results: int, page_token: str | 
         h = _headers(draft["message"]["payload"])
         out.append(
             _draft_summary(draft)
-            | {"to": h.get("to", ""), "subject": h.get("subject", ""), "snippet": draft["message"].get("snippet", "")}
+            | {"to": h.get("to", ""), "subject": h.get("subject", ""), "snippet": _snippet(draft["message"])}
         )
     return {"drafts": out, "next_page_token": listing.get("nextPageToken")}
 
