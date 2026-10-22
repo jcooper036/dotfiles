@@ -59,6 +59,8 @@ alias vim='nvim'
 alias new_claude_md='cp ~/dotfiles/claude/CLAUDE_TEMPLATE.md ./CLAUDE.md'
 # Gmail tools for omp agents: `omp-gmail setup|login|status` (see omp/README.md)
 alias omp-gmail='uv run --quiet --project ~/dotfiles/omp/gmail omp-gmail'
+# omp runs as the GitHub bot where the bot is installed (see gh-agent-team-bot/README.md); `command omp` bypasses it
+[ -f ~/.secrets/github_team_bot.env ] && alias omp='~/.bun/bin/bun ~/dotfiles/gh-agent-team-bot/src/cli.ts run omp'
 
 # git
 alias zrc='nvim ~/.zshrc'
