@@ -7,7 +7,7 @@ tool calls. No GUI session (SSH, headless, subagent-only machines) or no answer 
 import subprocess
 from datetime import datetime
 
-# Must stay under the MCP call timeout in omp/mcp.json (300 s) so a late click can't approve a call
+# Must stay under the MCP call timeout in omp/config/mcp.json (300 s) so a late click can't approve a call
 # the agent already saw time out.
 DIALOG_SECONDS = 240
 

@@ -1,0 +1,11 @@
+modelRoles:
+  default: anthropic/claude-opus-5-5:medium
+symbolPreset: nerd
+composer:
+  shape: band
+theme:
+  dark: titanium
+  light: light
+setupVersion: 2
+claudeResets:
+  autoRedeem: "no"

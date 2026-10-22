@@ -1,13 +1,25 @@
 # OhMyPi config
 Contains configuration, personal tools, skills, etc. for `omp` [https://omp.sh/docs](https://omp.sh/docs)
 
-## MCP servers
-`mcp.json` is omp's user-level MCP config. Symlink it once per machine:
+## Setup
 ```bash
-mkdir -p ~/.omp/agent
-ln -s ~/dotfiles/omp/mcp.json ~/.omp/agent/mcp.json
+~/dotfiles/omp/install.sh
 ```
-In a running omp session, `/mcp reload` picks up changes.
+Run it from the main checkout. Links point at the script's own location, so running it from a worktree links omp to files that disappear with the worktree. It is safe to rerun; it targets the agent dir that `omp config path` prints (normally `~/.omp/agent`).
+
+## omp state splits three ways
+
+### `config/` is linked, so changes land in the repo
+Every entry in `config/` is symlinked by name into the agent dir. This is for files that change slowly and that we want versioned: `AGENTS.md`, `RULES.md`, `keybindings.yml`, `models.yml`, `mcp.json`, `themes/`, `extensions/`, `hooks/`. If omp writes to one of these, the change shows up as a git diff, which is what we want for config that rarely moves. To add a file, put it in `config/` and rerun `install.sh`. A real file already sitting at a link target is moved aside to `<name>.bak-<timestamp>` before linking.
+
+### `defaults/` is copied, so omp owns the live file
+omp rewrites `config.yml` whenever a setting is saved: picking a model, `/settings`, `omp config set`, the setup wizard. Linking it would turn every model switch into a repo diff. The repo holds a starting point instead, and `install.sh` copies it only when the agent dir has no `config.yml`. `install.sh --reset-config` overwrites the live file with the default, backing the old one up first. To keep a setting long term, copy it into `defaults/config.yml` by hand.
+
+### Everything else stays local and is **never** committed
+The agent dir also holds logins and API keys (`agent.db`), prompt history, the model catalog, sessions, caches and blobs. These are machine state, and `agent.db` is a credential store. API keys for the shell go in `~/.secrets/*.env`; provider logins go through `/login`. Nothing in `config/` or `defaults/` may contain a secret.
+
+## MCP servers
+`config/mcp.json` is omp's user-level MCP config, linked like everything else in `config/`. In a running omp session, `/mcp reload` picks up changes.
 
 ## gmail
 `gmail/` is a local MCP server (Python, run through `uv`) that gives agents one Gmail account per machine (work account at work, personal account at home):
