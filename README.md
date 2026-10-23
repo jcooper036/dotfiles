@@ -139,6 +139,18 @@ nvim
 # Then run :Lazy sync and :MasonInstallAll
 ```
 
+# ghostty
+Config lives in `ghostty/config.ghostty`. Symlink the directory:
+```bash
+ln -s ~/dotfiles/ghostty ~/.config/ghostty
+```
+
+`keybind = global:alt+space=toggle_visibility` shows/hides Ghostty from anywhere (option+space). Setup on a new machine:
+1. Enable Ghostty in System Settings → Privacy & Security → Accessibility (required for `global:` keybinds).
+2. Reload config (`cmd+shift+,`) or relaunch Ghostty.
+3. Ghostty must already be running; the hotkey only toggles visibility, it cannot launch the app.
+4. If nothing happens, check for another app (Raycast, Alfred, Spotlight) bound to option+space.
+
 # claude
 Claude Code config, skills and agent instructions. Setup and symlinks: [claude/README.md](claude/README.md).
 
