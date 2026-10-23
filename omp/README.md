@@ -18,6 +18,21 @@ omp rewrites `config.yml` whenever a setting is saved: picking a model, `/settin
 ### Everything else stays local and is **never** committed
 The agent dir also holds logins and API keys (`agent.db`), prompt history, the model catalog, sessions, caches and blobs. These are machine state, and `agent.db` is a credential store. API keys for the shell go in `~/.secrets/*.env`; provider logins go through `/login`. Nothing in `config/` or `defaults/` may contain a secret.
 
+## Skills
+omp's skills dir (`~/.omp/agent/skills`) is the hub every agent on this machine reads skills from. It is machine state: each machine picks its own skills, so nothing in it is committed.
+
+### Each machine opts into skills by linking them
+```bash
+~/dotfiles/omp/link-skills.sh ~/dotfiles/claude/skills/<skill> ~/<repo>/.agents/skills/<skill>
+```
+The script links each skill folder into the hub under its frontmatter `name`, and refuses paths inside a worktree. Skills that exist only on this machine live in the hub as real folders. Skills inside a repo already load when an agent runs in that repo; link them only to use them everywhere. To drop a skill, delete its hub link and rerun the script.
+
+### Other agents read the hub through links
+Every run makes `~/.agents/skills` a link to the hub, which is where Codex and `npx skills` look, so `npx skills add` installs land in the hub as real folders. Every run also gives `~/.claude/skills` one link per hub skill and prunes links whose hub skill is gone. `~/.claude/skills` stays a real directory because Claude Code writes its own state there (`synced/` account skills, `.trash/`), so Claude's synced account skills stay Claude-only. omp reads the hub both directly and through `~/.agents/skills`, and merges the two because they resolve to the same files.
+
+### Link skill folders, never `SKILL.md`
+Codex ignores a linked `SKILL.md` file.
+
 ## Status line
 `defaults/config.yml` sets a custom status line: the default preset's segments, with `status` placed right after `context_pct`. `statusLine.contextLine: annotated` keeps the context percent as its own segment rather than inside the gauge line, so it comes before the weekly quota.
 
