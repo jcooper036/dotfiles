@@ -18,6 +18,11 @@ omp rewrites `config.yml` whenever a setting is saved: picking a model, `/settin
 ### Everything else stays local and is **never** committed
 The agent dir also holds logins and API keys (`agent.db`), prompt history, the model catalog, sessions, caches and blobs. These are machine state, and `agent.db` is a credential store. API keys for the shell go in `~/.secrets/*.env`; provider logins go through `/login`. Nothing in `config/` or `defaults/` may contain a secret.
 
+## Status line
+`defaults/config.yml` sets a custom status line: the default preset's segments, with `status` placed right after `context_pct`. `statusLine.contextLine: annotated` keeps the context percent as its own segment rather than inside the gauge line, so it comes before the weekly quota.
+
+`config/extensions/weekly-quota.ts` fills that `status` slot with the active account's 7-day usage, for example `Weekly 23%`. It reads the same numbers as `omp usage`, refetches every 5 minutes (at most once a minute after a turn), and picks up model switches within 2 seconds. Only Claude (`anthropic`) and Codex (`openai-codex`) are queried. Every other provider shows `Weekly Quota Unknown`. Other extensions' `setStatus` text also lands in the `status` segment, so `showHookStatus: false` keeps it from being shown a second time in the footer.
+
 ## MCP servers
 `config/mcp.json` is omp's user-level MCP config, linked like everything else in `config/`. In a running omp session, `/mcp reload` picks up changes.
 

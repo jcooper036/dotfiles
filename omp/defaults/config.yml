@@ -9,3 +9,17 @@ theme:
 setupVersion: 2
 claudeResets:
   autoRedeem: "no"
+statusLine:
+  # keeps context_pct a real segment (embedded moves it into the gauge, after the weekly quota)
+  contextLine: annotated
+  # default preset's segments with `status` (weekly-quota extension) after context_pct
+  preset: custom
+  separator: powerline-thin
+  leftSegments: [pi, vim, model, mode, collab, stream, path, git, pr, context_pct, status, cost]
+  rightSegments: [session_name]
+  # statuses already render in the `status` segment; don't repeat them in the footer
+  showHookStatus: false
+  segmentOptions:
+    model: { showThinkingLevel: true }
+    path: { abbreviate: true, maxLength: 40, stripWorkPrefix: true }
+    git: { showBranch: true, showStaged: true, showUnstaged: true, showUntracked: true }
