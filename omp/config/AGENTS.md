@@ -10,3 +10,14 @@
 - instead, if you find yourself on one of those branches, make a new worktree for the current changes first
 - once PRs are merged, remove old worktrees
 
+# dotfiles
+The user uses ~/dotfiles to store configs for different tools
+- vim
+- ghostty
+- omp
+- zsh
+
+Through a pattern of symlinking, they pass configs from here to other places
+
+Dotfiles is a personal repo, and it services different machines with different purposes. Do not commit work content here, no link work content there.
+
