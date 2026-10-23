@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Run a command with an installed Helm 3 first on PATH.
+set -euo pipefail
+
+HELM3_HOME="${HELM3_HOME:-$HOME/.local/share/helm3}"
+SETUP="~/dotfiles/tools/helm3/install.sh"
+
+usage() {
+  cat <<EOF
+Usage: with-helm3 <command> [args...]
+
+Runs <command> with an installed Helm 3 first on PATH, so both \`helm\` and any tool that looks
+up \`helm\` itself (skaffold 2.x drives Helm 3 only) see v3 while your default helm stays untouched.
+The command's exit status is returned unchanged.
+
+  with-helm3 helm template ./chart
+  with-helm3 skaffold deploy
+
+Helm is taken from \$HELM3_BIN if set, otherwise \$HELM3_HOME/current/bin/helm
+(default ~/.local/share/helm3). Its major version must be 3, and a \$HELM3_BIN file must be named
+\`helm\`: commands find Helm by that name on PATH, so any other name could run a different Helm.
+
+Nothing is downloaded or installed here. Set it up once, from the main dotfiles checkout:
+
+  $SETUP
+
+Exit status 64 is a usage error and 69 means no usable Helm 3 was found.
+EOF
+}
+
+case "${1:-}" in
+  -h | --help)
+    usage
+    exit 0
+    ;;
+  "")
+    usage >&2
+    exit 64
+    ;;
+esac
+
+helm="${HELM3_BIN:-$HELM3_HOME/current/bin/helm}"
+
+if [ "$(basename "$helm")" != helm ]; then
+  echo "with-helm3: $helm is not named helm, so PATH lookup could run a different Helm" >&2
+  exit 69
+fi
+
+if [ ! -x "$helm" ]; then
+  echo "with-helm3: no Helm 3 at $helm. Install one with: $SETUP" >&2
+  exit 69
+fi
+
+version="$("$helm" version --template '{{.Version}}' 2>/dev/null || true)"
+case "$version" in
+  v3.*) ;;
+  *)
+    echo "with-helm3: $helm reports '${version:-no version}', not Helm 3. Install one with: $SETUP" >&2
+    exit 69
+    ;;
+esac
+
+PATH="$(cd "$(dirname "$helm")" && pwd):$PATH"
+export PATH
+exec "$@"

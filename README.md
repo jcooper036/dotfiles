@@ -144,5 +144,21 @@ Claude Code config, skills and agent instructions. Setup and symlinks: [claude/R
 
 Optional workplace-specific GitHub bot authentication: [gh-agent-team-bot](gh-agent-team-bot/README.md). Installing these dotfiles does not enable it.
 
+# tools/helm3
+Skaffold 2.x drives Helm 3 only, and Homebrew's `helm` is Helm 4. `tools/helm3/` keeps a Helm 3 alongside it without replacing it.
+
+## Setup
+```bash
+~/dotfiles/tools/helm3/install.sh
+```
+Run it from the main checkout once per machine; rerunning is safe. It downloads Helm 3.21.3 for this OS and architecture (Darwin or Linux, arm64 or amd64), verifies the published `.sha256sum`, and installs the binary under `~/.local/share/helm3/v<version>/bin/` with a `current` link beside it. It also copies `with-helm3` to `~/.local/bin`. Nothing else is downloaded or installed later.
+
+## Use
+```bash
+with-helm3 skaffold deploy
+with-helm3 helm template ./chart
+```
+`with-helm3 <command>` puts the installed Helm 3 first on `PATH` for that one command, so `helm` and tools that look up `helm` themselves both see v3. It returns the command's exit status, and exits 69 if no Helm 3 is installed. `tools/helm3/test.sh` tests both scripts against a fake local release.
+
 # omp
 [omp](https://omp.sh/docs) config and personal tools, including the Gmail MCP server for agents and the skills hub every agent reads from. Run `~/dotfiles/omp/install.sh` from the main checkout to link it into `~/.omp/agent/`. What is linked, what is copied, and what stays local: [omp/README.md](omp/README.md).
