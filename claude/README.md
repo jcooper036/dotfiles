@@ -9,16 +9,8 @@ ln -s ~/dotfiles/claude/statusline-command.sh ~/.claude/statusline-command.sh
 ```
 
 ### Skills
-Each folder in `skills/` is one skill, symlinked individually into `~/.claude/skills/`. A new skill is not visible to Claude Code until you add its link.
+Claude Code reads the same skills as omp. `~/.claude/skills` holds one link per skill in omp's skills hub, maintained by `omp/link-skills.sh`. Setup and rules: [omp/README.md](../omp/README.md#skills).
 
-`~/.claude/skills` must be a real directory, not a symlink to `skills/`. Claude Code writes its own state there (`synced/` account skills, `.trash/`), and a directory symlink would land that state in this repo.
-
-`~/.agents/skills` is a symlink to `~/.claude/skills`, so every skill is shared with non-Claude agents.
-```bash
-mkdir -p ~/.claude/skills ~/.agents
-ln -s ~/.claude/skills ~/.agents/skills
-ln -s ~/dotfiles/claude/skills/<skill> ~/.claude/skills/<skill>
-```
 Skills with user-facing scripts (e.g. `cleanup`) get zsh aliases in `zshrc` pointing into `skills/<skill>/scripts/`.
 
 ### CLAUDE_root.md

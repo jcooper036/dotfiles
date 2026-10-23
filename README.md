@@ -145,4 +145,4 @@ Claude Code config, skills and agent instructions. Setup and symlinks: [claude/R
 Optional workplace-specific GitHub bot authentication: [gh-agent-team-bot](gh-agent-team-bot/README.md). Installing these dotfiles does not enable it.
 
 # omp
-[omp](https://omp.sh/docs) config and personal tools, including the Gmail MCP server for agents. Run `~/dotfiles/omp/install.sh` from the main checkout to link it into `~/.omp/agent/`. What is linked, what is copied, and what stays local: [omp/README.md](omp/README.md).
+[omp](https://omp.sh/docs) config and personal tools, including the Gmail MCP server for agents and the skills hub every agent reads from. Run `~/dotfiles/omp/install.sh` from the main checkout to link it into `~/.omp/agent/`. What is linked, what is copied, and what stays local: [omp/README.md](omp/README.md).
