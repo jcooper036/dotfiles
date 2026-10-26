@@ -1,6 +1,6 @@
 ---
 name: gobos
-description: Answer anything about Jacob's cron-driven agent workers ("gobos") — what ran, what it cost, what is in flight, why one failed, what a given agent actually did. They all live in /Users/jacob/workers and record to one sqlite file; this skill is the map to that record. Use it whenever a question touches the workers repo, a gobo, the overseer, worker_instances, gobo.sqlite, or one of the named workers (proteus-canary, proteus-feedback-to-issues, proteus-domain-annotation, proteus-ground-truth-import, proteus-erd-updater, leash-trunk-build, leash-issue-solver, leash-pr-fixer, worktree-pruner) — including from a session in some other repo that noticed an agent-created issue, PR, branch or worktree and wants to know which worker made it.
+description: Answer anything about Jacob's cron-driven agent workers ("gobos") — what ran, what it cost, what is in flight, why one failed, what a given agent actually did. They all live in /Users/jacob/workers and record to one sqlite file; this skill is the map to that record. Use it whenever a question touches the workers repo, a gobo, the overseer, worker_instances, gobo.sqlite, or one of the named workers (proteus-canary, feedback-service-to-issues, proteus-domain-annotation, proteus-ground-truth-import, proteus-erd-updater, proteus-performance-improver, leash-trunk-build, leash-issue-solver, leash-pr-fixer, leash-pr-merger, worktree-pruner) — including from a session in some other repo that noticed an agent-created issue, PR, branch or worktree and wants to know which worker made it.
 when_to_use: >-
   Triggers include: what ran overnight; why did the canary go red; what have the workers
   cost this week; is anything stuck; who opened this PR or this worktree; what did that
@@ -40,8 +40,10 @@ sqlite3 /Users/jacob/workers/var/gobo.sqlite
 
 `.schema` and `PRAGMA table_info(<t>)` are authoritative — the tables grow as gobos are
 added. Four core tables (`workers`, `worker_instances`, `logs`, and one `<gobo>_data` per
-gobo that returns a verdict) and a view per interesting gobo (`v_canary`, `v_feedback`,
+gobo that returns a verdict) and a view per interesting gobo (`v_canary`, `v_service_feedback`,
 `v_trunk_build`, plus `v_orphans`).
+`v_feedback` is the retired `proteus-feedback-to-issues` worker (history only, last run
+2026-10-23); live feedback triage is `feedback-service-to-issues` → `v_service_feedback`.
 
 Foreign keys are named `<table>_<column>`: `worker_instances_id` joins
 `worker_instances(id)`, `workers_name` joins `workers(name)`. Ids are uuid7, so
