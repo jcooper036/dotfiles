@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Resumes every omp session paused by omp-pause. Usage: omp-reconnect
+set -euo pipefail
+
+state="${OMP_PAUSE_FILE:-$HOME/.omp/agent/pause.json}"
+
+if [ ! -e "$state" ]; then
+  echo "not paused"
+  exit 0
+fi
+rm -f "$state"
+echo "resumed - sessions pick it up within a couple of seconds"

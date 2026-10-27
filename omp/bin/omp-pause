@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Pauses every omp session on this machine. Usage: omp-pause [reason...]
+# Sessions pick this up within a couple of seconds (config/extensions/pause.ts).
+set -euo pipefail
+
+state="${OMP_PAUSE_FILE:-$HOME/.omp/agent/pause.json}"
+reason="$*"
+
+if [ -e "$state" ]; then
+  echo "already paused since $(jq -r '.since // "unknown"' "$state" 2>/dev/null || echo unknown)"
+  [ -z "$reason" ] && exit 0
+fi
+
+mkdir -p "$(dirname "$state")"
+tmp="$(mktemp "$state.XXXXXX")"
+jq -n --arg reason "$reason" --arg since "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+  '{since: $since} + (if $reason == "" then {} else {reason: $reason} end)' > "$tmp"
+mv "$tmp" "$state"
+
+sessions="$(pgrep -x omp | wc -l | tr -d ' ')"
+echo "paused ${reason:+($reason) }- $sessions omp process(es) running; \`omp reconnect\` to resume"

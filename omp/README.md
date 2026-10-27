@@ -38,6 +38,15 @@ Codex ignores a linked `SKILL.md` file.
 
 `config/extensions/weekly-quota.ts` fills that `status` slot with the active account's 7-day usage, for example `Weekly 23%`. It reads the same numbers as `omp usage`, refetches every 5 minutes (at most once a minute after a turn), and picks up model switches within 2 seconds. Only Claude (`anthropic`) and Codex (`openai-codex`) are queried. Every other provider shows `Weekly Quota Unknown`. Other extensions' `setStatus` text also lands in the `status` segment, so `showHookStatus: false` keeps it from being shown a second time in the footer.
 
+## Pause and resume
+`omp pause [reason]` pauses every omp session on this machine (the reason is optional); `omp reconnect` resumes them. For going offline: agents are told to park their work, then to continue when the connection returns.
+
+- `omp` is a zsh function in `zshrc` that routes those two words to `omp/bin/omp-pause` and `omp/bin/omp-reconnect` (on `PATH` through `zshrc`) and passes everything else to omp, through the GitHub bot launcher where installed. Scripts and cron call the `omp-pause` / `omp-reconnect` scripts directly.
+- `omp-pause` writes `~/.omp/agent/pause.json` (`since`, optional `reason`); `omp-reconnect` deletes it. `OMP_PAUSE_FILE` overrides the path.
+- `config/extensions/pause.ts` polls that file every 2 seconds in every session, subagents included. On pause it shows `PAUSED` in the status line, steers a busy agent to park its work and end the turn, and blocks every tool call (an in-flight tool finishes). On resume it tells the agent to continue; only sessions that were mid-turn at pause restart on their own, idle ones just get the note.
+- A session started while paused is told at startup. Background workers that don't load extensions need their own check of the file.
+- Pause is cooperative: an agent mid-request finishes that request first.
+
 ## MCP servers
 `config/mcp.json` is omp's user-level MCP config, linked like everything else in `config/`. In a running omp session, `/mcp reload` picks up changes.
 
