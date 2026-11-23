@@ -139,6 +139,73 @@ nvim
 # Then run :Lazy sync and :MasonInstallAll
 ```
 
+## Machine-local config
+`init.lua` loads `~/.config/nvim/lua/local.lua` when it exists, after the shared options. That file is not in this repo (only `lua/custom` is symlinked), so it is the place for anything specific to one machine: project ids, work-only keymaps, enabling optional language servers. It is the nvim equivalent of `~/.zshrc.local`.
+
+## BigQuery (bqls)
+[bqls.nvim](https://github.com/kitagry/bqls.nvim) is installed on every machine, with the [bqls](https://github.com/kitagry/bqls) language server: completion for datasets, tables and columns, hover, diagnostics, a dry-run cost estimate on save, and query execution. It does nothing until a machine enables it in `local.lua`.
+
+### What the install does
+- `:Lazy sync` clones `bqls.nvim` at the commit pinned in `nvim/custom/plugins.lua`.
+- Its build step runs `nvim/custom/bin/install-bqls.sh`, which downloads the `bqls` release pinned in that script, verifies its sha256, and puts it in the plugin's `bin/`. Needs `curl` and `tar`. Nothing is added to `PATH`.
+- SQL buffers keep the default completion sources (LSP, snippets, buffer) with `vim-dadbod-completion` added, instead of dadbod only.
+
+### Enabling it on a machine
+1. Authenticate. bqls uses application-default credentials, not the `gcloud auth login` session that `bq` uses:
+   ```bash
+   gcloud auth application-default login
+   ```
+2. Create `~/.config/nvim/lua/local.lua`:
+   ```lua
+   local bq_project = "YOUR_PROJECT_ID"
+
+   -- *.bq files are SQL; bqls attaches only to *.bq and *.bq.sql so other SQL dialects stay clean.
+   vim.filetype.add({ extension = { bq = "sql" } })
+
+   vim.lsp.config("bqls", {
+     -- init_options, not settings: the server then never shells out to gcloud for a default project
+     init_options = { project_id = bq_project, location = "US" },
+     root_dir = function(bufnr, on_dir)
+       local name = vim.api.nvim_buf_get_name(bufnr)
+       if name:match("%.bq$") or name:match("%.bq%.sql$") then
+         on_dir(vim.fs.root(bufnr, ".git") or vim.fs.dirname(name))
+       end
+     end,
+   })
+   vim.lsp.enable("bqls")
+
+   local sidebar_ready = false
+   vim.keymap.set("n", "<leader>qs", function()
+     local bqls = require("bqls")
+     if not sidebar_ready then
+       bqls.setup({ project_ids = { bq_project } })
+       sidebar_ready = true
+     end
+     bqls.sidebar.toggle()
+   end, { desc = "BigQuery sidebar" })
+   ```
+   Drop the `root_dir` function to attach bqls to every SQL file.
+3. Restart nvim and open a `.bq` file. `:checkhealth vim.lsp` should list `bqls` as attached.
+
+### Using it
+- Completion and hover (`K`) work as in any LSP buffer. Press `K` again to move into the hover window and scroll it; `q` closes it.
+- `<leader>qd` dry-runs the buffer as it is, saved or not, and shows how many bytes the query will process. Saving does the same.
+- `<leader>qr` runs the whole buffer; results open in a new buffer. `gra` (Neovim's default code-action key) lists the other actions, such as job history.
+- In a result buffer: `:BqlsSave ./out.csv` saves it, `:BqlsCancelQuery` cancels a running query.
+- `<leader>qs` (from the `local.lua` above) toggles the dataset and table sidebar.
+
+### What leaves the machine
+Audited at the pinned versions (bqls v0.8.8, bqls.nvim `082e6c0`); re-check when bumping either. No telemetry, updater or non-Google endpoint was found.
+- Every save sends the whole buffer to BigQuery as a dry-run job, and names of tables referenced in the buffer are looked up as you type. Both show up in the project's job history and audit logs.
+- Query results leave BigQuery only through `:BqlsSave` or the "Save Result" code actions: to a local `.csv`, or to Google Sheets (`sheet://new` or a Sheets URL). Sheets export needs application-default credentials with the `drive` scope; do not grant it unless you want that path.
+- `~/.cache/bqls/cache.sqlite3` stores project, dataset and table names, nothing else.
+- Result buffers are ordinary markdown buffers: they can land in swap files, and any other LSP or completion plugin that attaches to markdown sees their contents.
+
+### Upgrading
+The server and the plugin are pinned separately and neither moves on `:Lazy update`.
+- Server: bump `VERSION` and the four checksums in `nvim/custom/bin/install-bqls.sh` from the release's `checksums.txt`, then run `:Lazy build bqls.nvim`.
+- Plugin: change `commit` in the `kitagry/bqls.nvim` spec, then `:Lazy sync`.
+
 # ghostty
 Config lives in `ghostty/config.ghostty`. Symlink the directory:
 ```bash

@@ -34,6 +34,11 @@ require "options"
 require "custom.options"
 require "autocmds"
 
+-- machine-specific config, not in dotfiles: ~/.config/nvim/lua/local.lua
+if vim.uv.fs_stat(vim.fn.stdpath "config" .. "/lua/local.lua") then
+  require "local"
+end
+
 vim.schedule(function()
   require "mappings"
   require "custom.mappings"

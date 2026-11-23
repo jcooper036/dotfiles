@@ -54,9 +54,52 @@ local plugins = {
 			vim.api.nvim_create_autocmd("FileType", {
 				pattern = { "sql", "mysql", "plsql" },
 				callback = function()
-					require("cmp").setup.buffer({ sources = { { name = "vim-dadbod-completion" } } })
+					-- Add dadbod next to the default sources; replacing them would drop LSP completion.
+					local cmp = require("cmp")
+					local sources = vim.deepcopy(cmp.get_config().sources)
+					table.insert(sources, 1, { name = "vim-dadbod-completion" })
+					cmp.setup.buffer({ sources = sources })
 				end,
 			})
+		end,
+	},
+
+	-- BigQuery language server client. Installed everywhere but inert until
+	-- `vim.lsp.enable("bqls")` runs in the machine-local lua/local.lua (see README).
+	{
+		"kitagry/bqls.nvim",
+		commit = "082e6c0ead00a28df51115577b1367309c519c56",
+		ft = "sql",
+		dependencies = { "neovim/nvim-lspconfig" },
+		init = function()
+			vim.api.nvim_create_autocmd("LspAttach", {
+				callback = function(args)
+					local client = vim.lsp.get_client_by_id(args.data.client_id)
+					if not client or client.name ~= "bqls" then
+						return
+					end
+					vim.keymap.set("n", "<leader>qr", function()
+						vim.lsp.buf.code_action({
+							apply = true,
+							filter = function(action)
+								return action.title == "Execute Query"
+							end,
+						})
+					end, { buffer = args.buf, desc = "BigQuery run query" })
+					-- bqls dry-runs on didSave, using its in-memory copy of the buffer, so nothing is written.
+					vim.keymap.set("n", "<leader>qd", function()
+						client:notify("textDocument/didSave", { textDocument = { uri = vim.uri_from_bufnr(args.buf) } })
+					end, { buffer = args.buf, desc = "BigQuery dry run" })
+				end,
+			})
+		end,
+		-- The server version is pinned in the script, not by this plugin's own install.sh.
+		build = function(plugin)
+			local script = vim.fn.stdpath("config") .. "/lua/custom/bin/install-bqls.sh"
+			local out = vim.system({ script, plugin.dir .. "/bin" }, { text = true }):wait()
+			if out.code ~= 0 then
+				error(out.stderr)
+			end
 		end,
 	},
 
