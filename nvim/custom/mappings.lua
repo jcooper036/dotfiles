@@ -1,3 +1,6 @@
+-- Scratch BigQuery queries; the same directory as `vbq` in zshrc.
+local bq_dir = vim.fn.expand("~/.bq_queries")
+
 local C = {
 	{
 		modes = { "n" },
@@ -107,6 +110,33 @@ local C = {
 			vim.diagnostic.open_float()
 		end,
 		opts = { desc = "Show diagnostic in floating window" },
+	},
+	{
+		modes = { "n" },
+		lhs = "<leader>qn",
+		rhs = function()
+			vim.fn.mkdir(bq_dir, "p")
+			vim.cmd.edit(bq_dir .. "/" .. os.date("%y%m%d_%H%M%S") .. ".bq")
+		end,
+		opts = { desc = "BigQuery new query" },
+	},
+	{
+		modes = { "n" },
+		lhs = "<leader>qf",
+		rhs = function()
+			vim.fn.mkdir(bq_dir, "p")
+			require("telescope.builtin").find_files({ cwd = bq_dir, prompt_title = "BigQuery queries" })
+		end,
+		opts = { desc = "BigQuery find query file" },
+	},
+	{
+		modes = { "n" },
+		lhs = "<leader>qw",
+		rhs = function()
+			vim.fn.mkdir(bq_dir, "p")
+			require("telescope.builtin").live_grep({ cwd = bq_dir, prompt_title = "BigQuery query text" })
+		end,
+		opts = { desc = "BigQuery grep queries" },
 	},
 }
 

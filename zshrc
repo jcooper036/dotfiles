@@ -95,6 +95,11 @@ alias cleanup-processes="$HOME/dotfiles/claude/skills/cleanup/scripts/cleanup-pr
 export TMUX_TMPDIR=~/.tmux-sock
 alias start_tmux="$HOME/dotfiles/tmux_startup.sh"
 
+# BigQuery scratch query: new timestamped file in ~/.bq_queries (nvim: <leader>qn new, qf find, qw grep)
+function vbq() {
+  mkdir -p ~/.bq_queries && cd ~/.bq_queries && nvim "$(date +%y%m%d_%H%M%S).bq"
+}
+
 # pytest
 alias pyt='if command -v uv >/dev/null; then uv run pytest; else pytest; fi'
 function py() {

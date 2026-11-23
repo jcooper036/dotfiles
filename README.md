@@ -82,6 +82,8 @@ This config will always load first, and at the end it attempts to load ~/.zshrc.
 
 Aliases live in `zshrc`, including aliases for scripts shipped inside Claude skills (see [claude/README.md](claude/README.md)).
 
+`vbq` starts a BigQuery scratch query: it moves to `~/.bq_queries` and opens a new `<yymmdd>_<hhmmss>.bq` file in nvim. See [BigQuery (bqls)](#bigquery-bqls).
+
 ## Worktrees
 `zsh/worktrees.zsh`, sourced by `zshrc`, moves between git worktrees. Worktrees always live at `<repo root>/.worktrees/<branch>`. Switching keeps the current subdirectory when it exists in the target.
 - `gws <branch>`: cd to the branch's worktree, creating the worktree (and the branch, from HEAD) if needed
@@ -159,9 +161,6 @@ nvim
    ```lua
    local bq_project = "YOUR_PROJECT_ID"
 
-   -- *.bq files are SQL; bqls attaches only to *.bq and *.bq.sql so other SQL dialects stay clean.
-   vim.filetype.add({ extension = { bq = "sql" } })
-
    vim.lsp.config("bqls", {
      -- init_options, not settings: the server then never shells out to gcloud for a default project
      init_options = { project_id = bq_project, location = "US" },
@@ -185,6 +184,7 @@ nvim
    end, { desc = "BigQuery sidebar" })
    ```
    Drop the `root_dir` function to attach bqls to every SQL file.
+   `.bq` is already registered as SQL by `nvim/custom/options.lua`.
 3. Restart nvim and open a `.bq` file. `:checkhealth vim.lsp` should list `bqls` as attached.
 
 ### Using it
@@ -193,6 +193,12 @@ nvim
 - `<leader>qr` runs the whole buffer; results open in a new buffer. `gra` (Neovim's default code-action key) lists the other actions, such as job history.
 - In a result buffer: `:BqlsSave ./out.csv` saves it, `:BqlsCancelQuery` cancels a running query.
 - `<leader>qs` (from the `local.lua` above) toggles the dataset and table sidebar.
+
+### Scratch queries
+Queries live in `~/.bq_queries`, one `<yymmdd>_<hhmmss>.bq` file each. A file only exists once you save it.
+- `vbq` (shell): move to `~/.bq_queries` and open a new query in nvim.
+- `<leader>qn`: open a new query from anywhere in nvim.
+- `<leader>qf`: Telescope over query files; `<leader>qw`: Telescope grep over query text.
 
 ### What leaves the machine
 Audited at the pinned versions (bqls v0.8.8, bqls.nvim `082e6c0`); re-check when bumping either. No telemetry, updater or non-Google endpoint was found.

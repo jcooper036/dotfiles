@@ -37,6 +37,9 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- *.bq files are BigQuery SQL (scratch queries from `vbq` / <leader>qn)
+vim.filetype.add({ extension = { bq = "sql" } })
+
 -- Auto-show diagnostic float on cursor hold (after 500ms by default)
 vim.api.nvim_create_autocmd("CursorHold", {
   callback = function()
