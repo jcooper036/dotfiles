@@ -93,6 +93,61 @@ local plugins = {
 				end,
 			})
 		end,
+		-- bqls.nvim hardcodes `split` for every query result, so runs stack up. Reuse one
+		-- results window instead, and let Tab / S-Tab cycle through the result buffers.
+		config = function()
+			local commands = require("bqls.commands")
+			local results_win
+
+			commands.execute_query_handler = function(err, result, params)
+				if err then
+					vim.notify("bqls: " .. err.message, vim.log.levels.ERROR)
+					return
+				end
+				if not result then
+					return
+				end
+
+				local bufnr = vim.uri_to_bufnr(result.textDocument.uri)
+				if not (results_win and vim.api.nvim_win_is_valid(results_win)) then
+					vim.cmd("split")
+					results_win = vim.api.nvim_get_current_win()
+				end
+				vim.api.nvim_set_current_win(results_win)
+				vim.api.nvim_win_set_buf(results_win, bufnr)
+				vim.lsp.buf_attach_client(bufnr, params.client_id)
+
+				local client = vim.lsp.get_client_by_id(params.client_id)
+				if client then
+					client:request(
+						"bqls/virtualTextDocument",
+						{ textDocument = { uri = result.textDocument.uri } },
+						require("bqls").handlers["bqls/virtualTextDocument"],
+						bufnr
+					)
+				end
+			end
+
+			local function cycle(step)
+				local bufs = vim.tbl_filter(function(b)
+					return vim.api.nvim_buf_is_loaded(b) and vim.api.nvim_buf_get_name(b):match("^bqls://")
+				end, vim.api.nvim_list_bufs())
+				local cur = vim.api.nvim_get_current_buf()
+				for i, b in ipairs(bufs) do
+					if b == cur then
+						vim.api.nvim_win_set_buf(0, bufs[(i - 1 + step) % #bufs + 1])
+						return
+					end
+				end
+			end
+			vim.api.nvim_create_autocmd("BufEnter", {
+				pattern = "bqls://*",
+				callback = function(ev)
+					vim.keymap.set("n", "<Tab>", function() cycle(1) end, { buffer = ev.buf, desc = "Next BigQuery result" })
+					vim.keymap.set("n", "<S-Tab>", function() cycle(-1) end, { buffer = ev.buf, desc = "Previous BigQuery result" })
+				end,
+			})
+		end,
 		-- The server version is pinned in the script, not by this plugin's own install.sh.
 		build = function(plugin)
 			local script = vim.fn.stdpath("config") .. "/lua/custom/bin/install-bqls.sh"
