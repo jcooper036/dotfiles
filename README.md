@@ -190,7 +190,7 @@ nvim
 ### Using it
 - Completion and hover (`K`) work as in any LSP buffer. Press `K` again to move into the hover window and scroll it; `q` closes it.
 - `<leader>qd` dry-runs the buffer as it is, saved or not, and shows how many bytes the query will process. Saving does the same.
-- `<leader>qr` runs the whole buffer; results open in a new buffer. `gra` (Neovim's default code-action key) lists the other actions, such as job history.
+- `<leader>qr` runs the whole buffer; results open in a single reusable split below the query (each run swaps its buffer in); `Tab` / `S-Tab` in a result cycle through earlier results. `gra` (Neovim's default code-action key) lists the other actions, such as job history.
 - In a result buffer: `:BqlsSave ./out.csv` saves it, `:BqlsCancelQuery` cancels a running query.
 - `<leader>qs` (from the `local.lua` above) toggles the dataset and table sidebar.
 
